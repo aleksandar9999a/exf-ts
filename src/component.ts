@@ -4,7 +4,7 @@ import { Component } from "./packages/decorators/Component";
 
 const rootTemplate = (context: any) => createHTMLSource`
 <div>
-    <button @click=${() => context.counter++}>test</button>
+    <button @click=${context.increase}>test</button>
     <p>${context.counter}</p>
 </div>
 `;
@@ -15,6 +15,9 @@ const rootTemplate = (context: any) => createHTMLSource`
 })
 class AppRoot {
     @state counter = 0;
+    increase() {
+        this.counter++;
+    }
 
     constructor() {
 

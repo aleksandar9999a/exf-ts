@@ -39,7 +39,7 @@ export function Component<T>({ selector, templateFn }: { selector: string, templ
                 events.forEach(event => {
                     const el = this.root.getElementById(event.id);
                     if (el) {
-                        el.addEventListener(event.name, event.value)
+                        el.addEventListener(event.name, event.value.bind(this))
                     }
                 })
             }
