@@ -1,27 +1,50 @@
 import { createHTMLSource } from "./packages/ex-html";
 import ITag from "./packages/ex-html/interfaces/ITagEvent";
 
-class App extends HTMLElement {
-    attachEvents(root: ShadowRoot, events: ITag[]) {
+const rootTemplate = (context: any) => createHTMLSource`
+<div><button @click=${() => context.counter++}>test</button><p>${context.counter}</p></div>
+`;
+
+class AppRoot extends HTMLElement {
+    root: ShadowRoot;
+    _counter: number = 0;
+
+    set counter(value: any) {
+        this._counter = value;
+        this.update();
+    }
+
+    get counter() {
+        return this._counter;
+    }
+
+    constructor() {
+        super();
+        this.root = this.attachShadow({ mode: "closed" });
+        this.update();
+    }
+
+    update() {
+        this.root.innerHTML = "";
+        const source = rootTemplate(this);
+        this.render(source.template);
+        this.attachEvents(source.events)
+    }
+
+    render(template: HTMLTemplateElement) {
+        this.root.appendChild(
+            template.content.cloneNode(true)
+        );
+    }
+
+    attachEvents(events: ITag[]) {
         events.forEach(event => {
-            const el = root.getElementById(event.id);
-            if(el) {
+            const el = this.root.getElementById(event.id);
+            if (el) {
                 el.addEventListener(event.name, event.value)
             }
         })
     }
-    
-    constructor() {
-        super();
-        const root = this.attachShadow({ mode: "closed" });
-        const source = createHTMLSource`<div><button @click=${() => console.log('It Work!')}>test</button><p>raboti</p></div>`;
-
-        root.appendChild(
-            source.template.content.cloneNode(true)
-        );
-
-        this.attachEvents(root, source.events);
-    }
 }
 
-customElements.define("hg-app", App);
+customElements.define("hg-app", AppRoot);
