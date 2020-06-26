@@ -5,18 +5,32 @@ const rootTemplate = (context: any) => createHTMLSource`
 <div><button @click=${() => context.counter++}>test</button><p>${context.counter}</p></div>
 `;
 
+function state(target: any, key: string, descriptor?: TypedPropertyDescriptor<any>) {
+    if (!!descriptor) {
+        const currentMethod = descriptor.value;
+        descriptor.value = function (this: any, ...args: any[]) {
+            currentMethod(...args);
+            if (this.update) { this.update(); }
+        }
+        return;
+    }
+
+    let val: any;
+
+    Object.defineProperty(target, key, {
+        set(newValue) {
+            val = newValue;
+            if (this.update) { this.update(); }
+        },
+        get() {
+            return val;
+        }
+    });
+}
+
 class AppRoot extends HTMLElement {
     root: ShadowRoot;
-    _counter: number = 0;
-
-    set counter(value: any) {
-        this._counter = value;
-        this.update();
-    }
-
-    get counter() {
-        return this._counter;
-    }
+    @state counter = 0;
 
     constructor() {
         super();
@@ -25,10 +39,11 @@ class AppRoot extends HTMLElement {
     }
 
     update() {
+        if (!this.root) { return; }
         this.root.innerHTML = "";
         const source = rootTemplate(this);
         this.render(source.template);
-        this.attachEvents(source.events)
+        this.attachEvents(source.events);
     }
 
     render(template: HTMLTemplateElement) {
