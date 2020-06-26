@@ -56,16 +56,16 @@ function generateTag(fullTag: string, expression: unknown) {
         id = expression as string;
     }
 
-    if (!!expression && !id && (!!event || !!attribute)) {
+    if (expression != undefined && !id && (!!event || !!attribute)) {
         id = uid();
         result.tag += `id=${id}`;
     }
 
-    if (!!expression && !event && !attribute) {
+    if (expression != undefined && !event && !attribute) {
         result.tag += expression;
     }
 
-    if (attribute && expression && id) {
+    if (attribute && expression != undefined && id) {
         result.tag += `${attribute}="${expression}"`;
         result.attributes.push({ id, name: attribute, value: expression });
     }
