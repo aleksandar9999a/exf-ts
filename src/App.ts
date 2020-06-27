@@ -1,19 +1,24 @@
 import { Component } from './packages/decorators/Component';
 import template from './App.html';
-import { Prop } from './packages/decorators/Prop';
+import { State } from './packages/decorators/State';
 
 @Component({
     selector: 'ex-home',
     template
 })
 class Home {
-    @Prop
+    @State
     counter = 0;
-    @Prop
+    @State
     text = 1;
+    @State
+    value = 1;
 
     increase() {
         this.counter++;
-        this.text++;
+    }
+
+    handleChange(e: any) {
+        this.text = e.target.value
     }
 }
