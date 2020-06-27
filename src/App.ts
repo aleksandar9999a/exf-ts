@@ -9,8 +9,11 @@ import { Prop } from './packages/decorators/Prop';
 class Home {
     @Prop
     counter = 0;
+    @Prop
+    text = 1;
 
     increase() {
         this.counter++;
+        this.text++;
     }
 }

@@ -13,7 +13,7 @@ export function Prop(target: any, key: string, descriptor?: TypedPropertyDescrip
     Object.defineProperty(target, key, {
         set(newValue) {
             val = newValue;
-            if (this.update) { this.update(); }
+            if (this.updateProp) { this.updateProp(); }
         },
         get() {
             return val;
