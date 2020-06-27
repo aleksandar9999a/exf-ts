@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: path.resolve(__dirname, 'src', 'index.ts'),
+    entry:  path.resolve(__dirname, 'src', 'index.ts'),
     output: {
         path: path.resolve(__dirname, 'dist'),
         chunkFilename: '[name].js',
@@ -15,12 +15,13 @@ module.exports = {
         }
     },
     resolve: {
-        extensions: [".ts", ".js"]
+        extensions: [".ts", "html", ".js"]
     },
     devtool: 'source-map',
     module: {
         rules: [
-            { test: /\.ts$/, loader: "ts-loader", exclude: /node_modules/ }
+            { test: /\.ts$/, loader: "ts-loader", exclude: /node_modules/ },
+            { test: /\.html$/, loader: 'html-loader' }
         ]
     },
     devServer: {

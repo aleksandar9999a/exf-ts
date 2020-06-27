@@ -1,17 +1,10 @@
-import ITag from "../ex-html/interfaces/ITagEvent";
-import ITemplateResult from "../ex-html/interfaces/ITemplateResult";
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
+import { replaceProps, addActions } from '../html';
 
-interface IComponent {
-    root: ShadowRoot,
-    update: () => void;
-    render: (template: HTMLTemplateElement) => void;
-    attachEvents: (events: ITag[]) => void;
-}
 
-export function Component<T>({ selector, templateFn }: { selector: string, templateFn: (context: T) => ITemplateResult }) {
+export function Component({ selector, template }: { selector: string, template: string }) {
     return function componentDecorator(target: any) {
-        class BasicComponent extends HTMLElement implements IComponent {
+        class BasicComponent extends HTMLElement {
             root: ShadowRoot;
 
             constructor() {
@@ -23,25 +16,12 @@ export function Component<T>({ selector, templateFn }: { selector: string, templ
 
             update() {
                 if (!this.root) { return; }
-                const source = templateFn(this as any);
-                this.render(source.template);
-                this.attachEvents(source.events);
-            }
-
-            render(template: HTMLTemplateElement) {
                 this.root.innerHTML = "";
+                const html = replaceProps(template, this);
                 this.root.appendChild(
-                    template.content.cloneNode(true)
+                    html.content.cloneNode(true)
                 );
-            }
-
-            attachEvents(events: ITag[]) {
-                events.forEach(event => {
-                    const el = this.root.getElementById(event.id);
-                    if (el) {
-                        el.addEventListener(event.name, event.value.bind(this))
-                    }
-                })
+                addActions.bind(this)(this.root.querySelectorAll('*'), this)
             }
         }
 

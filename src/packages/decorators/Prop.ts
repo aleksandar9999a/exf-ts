@@ -1,4 +1,4 @@
-export function state(target: any, key: string, descriptor?: TypedPropertyDescriptor<any>) {
+export function Prop(target: any, key: string, descriptor?: TypedPropertyDescriptor<any>) {
     if (!!descriptor) {
         const currentMethod = descriptor.value;
         descriptor.value = function (this: any, ...args: any[]) {
