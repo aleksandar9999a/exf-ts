@@ -1,6 +1,6 @@
 export interface IHTMLRepresentation {
-    tag: string, 
-    attributes: NamedNodeMap,
-    childrens: IHTMLRepresentation[], 
+    tag: string,
+    attributes: { name: string, value: any }[],
+    childrens: IHTMLRepresentation[],
     content: string
 }
