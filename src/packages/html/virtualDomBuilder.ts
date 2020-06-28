@@ -1,4 +1,4 @@
-import { IHTMLRepresentation } from "./interfaces";
+import { IHTMLRepresentation, IElementChange } from "./interfaces";
 import { events } from "./events-register";
 
 class VirtualDomBuilder {
@@ -71,11 +71,11 @@ class VirtualDomBuilder {
     }
 
     private compareStates(oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[], context: any) {
-        let changes: any = [];
+        let changes: IElementChange[] = [];
         newState.forEach((el, i) => {
             const oldEl = oldState[i];
             let hasChange = false
-            let change: any = { index: i, changes: [] };
+            let change: IElementChange = { index: i, changes: [] };
 
             if (el.tag !== oldEl.tag) {
                 change.changes.push({ name: 'tag', value: el.tag });
@@ -109,8 +109,8 @@ class VirtualDomBuilder {
         return changes;
     }
 
-    private updateHTML(childrens: HTMLCollection, map: any) {
-        map.forEach(({ index, changes }: any) => {
+    private updateHTML(childrens: HTMLCollection, map: IElementChange[]) {
+        map.forEach(({ index, changes }) => {
             const currEl = childrens[index];
 
             changes.forEach((({ name, value }: any) => {
