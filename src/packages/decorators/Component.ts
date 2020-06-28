@@ -1,28 +1,31 @@
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
-import { updateTemplate, compileRealDom, addActions } from '../html';
+import { IHTMLRepresentation } from '../html/interfaces';
+import { IComponentDecorator } from './interfaces';
+import VirtualDomBuilder from '../html/virtualDomBuilder';
 
 export function Component({ selector, template }: { selector: string, template: string }) {
     return function componentDecorator(target: any) {
-        class BasicComponent extends HTMLElement {
+
+        class BasicComponent extends HTMLElement implements IComponentDecorator {
             root: ShadowRoot;
-            stringTemplate: string;
-            realDom: HTMLTemplateElement;
+            VirtualDomBuilder = VirtualDomBuilder;
+            currRepresentation: IHTMLRepresentation[];
+            virtualDom: IHTMLRepresentation[];
+            realDom: HTMLElement;
 
             constructor() {
                 super();
                 target.call(this);
-                this.stringTemplate = template;
                 this.root = this.attachShadow({ mode: "closed" });
-                this.realDom = compileRealDom(this, template);
-                this.root.appendChild(
-                    this.realDom.content.cloneNode(true)
-                );
-                addActions(this);
+                this.virtualDom = VirtualDomBuilder.createVirtualDom(template);
+                this.currRepresentation = VirtualDomBuilder.createState(this.virtualDom, this);
+                this.realDom = VirtualDomBuilder.createRealDom(this.currRepresentation, this);
+                this.root.appendChild(this.realDom);
             }
 
-            updateProp() {
+            update() {
                 if (!this.root) { return; }
-                updateTemplate(this);
+                this.currRepresentation = VirtualDomBuilder.update(this, this.virtualDom, this.currRepresentation);
             }
         }
 
