@@ -12,7 +12,7 @@ class Home {
     @State
     text = 1;
     @State
-    value = 1;
+    inputValue = 1;
 
     increase() {
         this.counter++;
