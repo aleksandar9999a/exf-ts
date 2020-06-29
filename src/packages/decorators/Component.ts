@@ -1,10 +1,13 @@
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
-import { IHTMLRepresentation } from '../html/interfaces';
-import { IComponentDecorator } from './interfaces';
 import VirtualDomBuilder from '../html/virtualDomBuilder';
+import 'reflect-metadata';
+import { IComponentDecorator, IHTMLRepresentation } from '../interfaces/interfaces';
 
 export function Component({ selector, template }: { selector: string, template: string }) {
     return function componentDecorator(target: any) {
+
+        // console.log(Reflect.getMetadata('design:paramtypes', target));
+        const attributes = Reflect.getMetadata('component:attributes', target.prototype) || [];
 
         class BasicComponent extends HTMLElement implements IComponentDecorator {
             root: ShadowRoot;
@@ -12,6 +15,14 @@ export function Component({ selector, template }: { selector: string, template: 
             currRepresentation: IHTMLRepresentation[];
             virtualDom: IHTMLRepresentation[];
             realDom: HTMLElement;
+
+            static get observedAttributes() {
+                return attributes;
+            }
+
+            attributeChangedCallback(name: any, oldValue: any, newValue: any) {
+                (this as any)[name] = newValue;
+            }
 
             constructor() {
                 super();
