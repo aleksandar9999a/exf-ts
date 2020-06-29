@@ -1,11 +1,11 @@
-import { Component, State } from "../../packages/decorators";
+import { Component, Attribute } from "../../packages/decorators";
 
 @Component({
     selector: 'exf-router-link',
     template: '<a href="javascript:;" $click="handleClick">${innerHTML}</a>'
 })
 export class RouterLink {
-    to = (this as any as HTMLElement).getAttribute('to');
+    @Attribute to!: string;
 
     handleClick(e: any) {
         e.preventDefault();

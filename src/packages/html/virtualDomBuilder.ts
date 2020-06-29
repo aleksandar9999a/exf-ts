@@ -1,4 +1,4 @@
-import { IHTMLRepresentation, IElementChange } from "./interfaces";
+import { IHTMLRepresentation, IElementChange } from "./../interfaces/interfaces";
 import { events } from "./events-register";
 
 class VirtualDomBuilder {
