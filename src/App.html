@@ -1,12 +1,12 @@
 <div>
     <h3>Home</h3>
     <div>
-        <exf-link link="/about">About</exf-link>
-        <exf-link link="/contacts">Contacts</exf-link>
+        <exf-router-link to="/about">About</exf-router-link>
+        <exf-router-link to="/contacts">Contacts</exf-router-link>
     </div>
-    <exf-outlet>
+    <exf-router-outlet>
         <exf-about routerLink="/about"></exf-about>
         <exf-contacts routerLink="/contacts"></exf-contacts>
         <exf-not-found routerLink="*"></exf-not-found>
-    </exf-outlet>
+    </exf-router-outlet>
 </div>

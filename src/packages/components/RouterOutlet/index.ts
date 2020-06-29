@@ -1,23 +1,22 @@
-import { Component } from "./../../packages/decorators/Component";
-
+import { Component } from "../../decorators/Component";
 
 @Component({
-    selector: 'exf-outlet',
+    selector: 'exf-router-outlet',
     template: ''
 })
-export class Outlet {
+export class RouterOutlet {
     outlet: HTMLElement;
     childrens: Element[] = [];
     default: Element | undefined;
 
     constructor() {
         this.outlet = (this as any as HTMLElement);
-        this.childrens = Array.prototype.slice.call(this.outlet.children);
-        this.default = this.childrens.find(child => child.getAttribute('routerLink') === '*');
-        (this.outlet as any).innerHTML = "";
     }
 
     connectedCallback() {
+        this.childrens = Array.prototype.slice.call(this.outlet.children);
+        this.default = this.childrens.find(child => child.getAttribute('routerLink') === '*');
+        (this.outlet as any).innerHTML = "";
         window.addEventListener('locationchange', this.stateChangeHandler.bind(this));
         this.render();
     }
