@@ -1,7 +1,12 @@
-<h3>Home</h3>
-<button $click="increase">Click</button>
-<p>Counter: ${counter}</p>
 <div>
-    <input $value="text" $input="handleChange" />
-    <p>${text}</p>
+    <h3>Home</h3>
+    <div>
+        <exf-link link="/about">About</exf-link>
+        <exf-link link="/contacts">Contacts</exf-link>
+    </div>
+    <exf-outlet>
+        <exf-about routerLink="/about"></exf-about>
+        <exf-contacts routerLink="/contacts"></exf-contacts>
+        <exf-not-found routerLink="*"></exf-not-found>
+    </exf-outlet>
 </div>
