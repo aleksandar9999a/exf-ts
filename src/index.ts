@@ -1,5 +1,7 @@
 import './packages';
 import './App'
-import './components/About/About';
-import './components/Contacts/Contacts';
-import './components/NotFound/NotFound';
+import './components/About';
+import './components/Contacts';
+import './components/NotFound';
+import './components/RouterLink';
+import './components/RouterOutlet';

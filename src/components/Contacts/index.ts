@@ -1,10 +1,10 @@
-import template from './About.html';
+import template from './template.html';
 import { Component } from '../../packages/decorators/Component';
 
 @Component({
-    selector: 'exf-about',
+    selector: 'exf-contacts',
     template
 })
-export class About {
+export class Contacts {
     
 }

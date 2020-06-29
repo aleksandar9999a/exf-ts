@@ -1,4 +1,4 @@
-import { Component } from "../../decorators/Component";
+import { Component } from "../../packages/decorators";
 
 @Component({
     selector: 'exf-router-outlet',
@@ -11,12 +11,12 @@ export class RouterOutlet {
 
     constructor() {
         this.outlet = (this as any as HTMLElement);
-    }
-
-    connectedCallback() {
         this.childrens = Array.prototype.slice.call(this.outlet.children);
         this.default = this.childrens.find(child => child.getAttribute('routerLink') === '*');
         (this.outlet as any).innerHTML = "";
+    }
+
+    connectedCallback() {
         window.addEventListener('locationchange', this.stateChangeHandler.bind(this));
         this.render();
     }
