@@ -2,8 +2,8 @@ import { IHTMLRepresentation, IElementChange } from "./interfaces";
 import { events } from "./events-register";
 
 class VirtualDomBuilder {
-    state_reg = /\${\w+}/g;
-    attr_reg = /\$[\w]+/g;
+    private state_reg = /\${\w+}/g;
+    private attr_reg = /\$[\w]+/g;
 
     private createElement(type: string, content?: any): HTMLElement {
         let e = document.createElement(type);
