@@ -11,11 +11,11 @@ export class RouterOutlet {
 
     constructor() {
         this.outlet = (this as any as HTMLElement);
-        this.childrens = Array.prototype.slice.call(this.outlet.children);
-        this.default = this.childrens.find(child => child.getAttribute('routerLink') === '*');
     }
 
     connectedCallback() {
+        this.childrens = Array.prototype.slice.call(this.outlet.children);
+        this.default = this.childrens.find(child => child.getAttribute('routerLink') === '*');
         window.addEventListener('locationchange', this.stateChangeHandler.bind(this));
         this.render();
     }
@@ -29,11 +29,12 @@ export class RouterOutlet {
         const path = window.location.pathname;
         const child = this.childrens.find(child => child.getAttribute('routerLink') === path);
         this.outlet.innerHTML = '';
-
+        (this.outlet as any).root.innerHTML = '';
+        
         if (child) {
-            this.outlet.appendChild(child);
+            (this.outlet as any).root.appendChild(child);
         } else if(this.default) {
-            this.outlet.appendChild(this.default);
+            (this.outlet as any).root.appendChild(this.default);
         } else {
             throw new Error('Invalid route link!');
         }

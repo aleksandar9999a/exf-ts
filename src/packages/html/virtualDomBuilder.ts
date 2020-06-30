@@ -15,6 +15,7 @@ export class VirtualDomBuilder implements IVirtualDomBuilder{
         if (typeof content === "object") {
             e.appendChild(content);
         }
+
         return e;
     }
 
@@ -136,7 +137,7 @@ export class VirtualDomBuilder implements IVirtualDomBuilder{
         return vDom;
     }
 
-    createRealDom(vDom: IHTMLRepresentation[], context: any) {
+    createRealDom(vDom: IHTMLRepresentation[], context: any): HTMLElement {
         return this.createDomElement(context, { tag: 'div', attributes: [], childrens: vDom, content: '' })
     }
 

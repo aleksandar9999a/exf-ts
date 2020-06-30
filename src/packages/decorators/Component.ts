@@ -1,19 +1,20 @@
-import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
 import { IComponentDecorator, IHTMLRepresentation, IVirtualDomBuilder, IWorkLoop, IElementChange } from '../interfaces/interfaces';
 import { Inject } from './Injectable';
 
-export function Component({ selector, template }: { selector: string, template: string }): ClassDecorator {
+export function Component({ selector, template }: { selector: string, template: string }): any {
     return function componentDecorator(target: any) {
         const attributes = Reflect.getMetadata('component:attributes', target.prototype) || [];
 
-        class BasicComponent extends HTMLElement implements IComponentDecorator{
+
+        class BasicComponent extends HTMLElement implements IComponentDecorator {
             @Inject('VirtualDomBuilder') private vDomBuilder!: IVirtualDomBuilder;
             @Inject('WorkLoop') private workLoop!: IWorkLoop;
+            root: ShadowRoot;
             currRepresentation: IHTMLRepresentation[];
             lastChanges: IElementChange[] = [];
             virtualDom: IHTMLRepresentation[];
-            realDom: HTMLElement;
-            
+            realDom: HTMLElement | HTMLTemplateElement;
+
             static get observedAttributes() {
                 return attributes;
             }
@@ -22,13 +23,14 @@ export function Component({ selector, template }: { selector: string, template: 
                 (this as any)[name] = newValue;
             }
 
-            constructor( ) {
+            constructor() {
                 super();
                 target.call(this);
+                this.root = this.attachShadow({ mode: 'closed' })
                 this.virtualDom = this.vDomBuilder.createVirtualDom(template);
                 this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);
                 this.realDom = this.vDomBuilder.createRealDom(this.currRepresentation, this);
-                this.appendChild(this.realDom);
+                this.root.appendChild(this.realDom);
             }
 
             update() {
@@ -39,9 +41,9 @@ export function Component({ selector, template }: { selector: string, template: 
                     return this.updateView.bind(this);
                 })
             }
-            
+
             updateView() {
-                this.vDomBuilder.updateHTML(this.children[0].children, this.lastChanges);
+                this.vDomBuilder.updateHTML(this.root.children[0].children, this.lastChanges);
             }
         }
 
@@ -50,6 +52,6 @@ export function Component({ selector, template }: { selector: string, template: 
 
         customElements.define(selector, BasicComponent);
         target.selector = selector;
-        return target;
+        return BasicComponent;
     }
 }

@@ -1,16 +1,15 @@
-import { Component, Attribute } from "../../packages/decorators";
+import { Component, Attribute, State } from "../../packages/decorators";
 
 @Component({
     selector: 'exf-router-link',
-    template: '<a href="javascript:;" $click="handleClick">${routename}</a>'
+    template: '<a href="javascript:;" $click="handleClick">${innerHTML}</a>'
 })
 export class RouterLink {
     @Attribute to!: string;
-    routename: string;
+    @State name!: string;
 
-    constructor() {
-        this.routename = (this as any).innerHTML;
-        (this as any).innerHTML= '';
+    connectedCallback() {
+        this.name = (this as any).innerHTML;
     }
 
     handleClick(e: any) {
