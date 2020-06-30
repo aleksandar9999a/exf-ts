@@ -1,5 +1,5 @@
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
-import { IComponentDecorator, IHTMLRepresentation, IVirtualDomBuilder } from '../interfaces/interfaces';
+import { IComponentDecorator, IHTMLRepresentation, IVirtualDomBuilder, IWorkLoop, IElementChange } from '../interfaces/interfaces';
 import { Inject } from './Injectable';
 
 export function Component({ selector, template }: { selector: string, template: string }): ClassDecorator {
@@ -8,8 +8,10 @@ export function Component({ selector, template }: { selector: string, template: 
 
         class BasicComponent extends HTMLElement implements IComponentDecorator{
             @Inject('VirtualDomBuilder') private vDomBuilder!: IVirtualDomBuilder;
+            @Inject('WorkLoop') private workLoop!: IWorkLoop;
             root: ShadowRoot;
             currRepresentation: IHTMLRepresentation[];
+            lastChanges: IElementChange[] = [];
             virtualDom: IHTMLRepresentation[];
             realDom: HTMLElement;
             
@@ -29,11 +31,21 @@ export function Component({ selector, template }: { selector: string, template: 
                 this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);
                 this.realDom = this.vDomBuilder.createRealDom(this.currRepresentation, this);
                 this.root.appendChild(this.realDom);
+                this.innerHTML = "";
             }
 
             update() {
                 if (!this.root) { return; }
-                this.currRepresentation = this.vDomBuilder.update(this, this.virtualDom, this.currRepresentation);
+                this.workLoop.pushWork(() => {
+                    const { newState, changes } = this.vDomBuilder.update(this, this.virtualDom, this.currRepresentation);
+                    this.currRepresentation = newState;
+                    this.lastChanges = changes;
+                    return this.updateView.bind(this);
+                })
+            }
+            
+            updateView() {
+                this.vDomBuilder.updateHTML(this.root.children[0].children, this.lastChanges);
             }
         }
 
