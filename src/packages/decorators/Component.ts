@@ -49,5 +49,7 @@ export function Component({ selector, template }: { selector: string, template: 
         Object.defineProperties(BasicComponent.prototype, others);
 
         customElements.define(selector, BasicComponent);
+        target.selector = selector;
+        return target;
     }
 }

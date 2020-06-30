@@ -3,10 +3,10 @@ import template from './App.html';
 import { State } from './packages';
 
 @Component({
-    selector: 'exf-home',
+    selector: 'exf-app',
     template
 })
-export class Home {
+export class App {
     @State
     text = '';
     

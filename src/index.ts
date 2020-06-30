@@ -1,8 +1,5 @@
 import "reflect-metadata";
 import './packages';
-import './App'
-import './components/About';
-import './components/Contacts';
-import './components/NotFound';
-import './components/RouterLink';
-import './components/RouterOutlet';
+import { bootstrap } from "./packages/bootstrap/bootstrap";
+
+bootstrap()
