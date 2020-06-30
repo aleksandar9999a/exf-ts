@@ -1,16 +1,19 @@
 <div>
     <h3>Home</h3>
     <div>
-        <input $value="text" $input="handleInput"/>
-        <p>${text}</p>
-    </div>
-    <div>
+        <exf-router-link to="/">Home</exf-router-link>
         <exf-router-link to="/about">About</exf-router-link>
         <exf-router-link to="/contacts">Contacts</exf-router-link>
     </div>
     <exf-router-outlet>
+        <exf-home routerLink="/"></exf-home>
         <exf-about routerLink="/about"></exf-about>
         <exf-contacts routerLink="/contacts"></exf-contacts>
         <exf-not-found routerLink="*"></exf-not-found>
     </exf-router-outlet>
+    <div>
+        <input $value="text" $input="handleInput"/>
+        <p>${text}</p>
+    </div>
+   
 </div>
