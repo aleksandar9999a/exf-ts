@@ -28,12 +28,12 @@ export class RouterOutlet {
     render() {
         const path = window.location.pathname;
         const child = this.childrens.find(child => child.getAttribute('routerLink') === path);
-        ((this.outlet as any).root as ShadowRoot).innerHTML = '';
+        this.outlet.innerHTML = '';
 
         if (child) {
-            ((this.outlet as any).root as ShadowRoot).appendChild(child);
+            this.outlet.appendChild(child);
         } else if(this.default) {
-            ((this.outlet as any).root as ShadowRoot).appendChild(this.default);
+            this.outlet.appendChild(this.default);
         } else {
             throw new Error('Invalid route link!');
         }

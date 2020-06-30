@@ -9,7 +9,6 @@ export function Component({ selector, template }: { selector: string, template: 
         class BasicComponent extends HTMLElement implements IComponentDecorator{
             @Inject('VirtualDomBuilder') private vDomBuilder!: IVirtualDomBuilder;
             @Inject('WorkLoop') private workLoop!: IWorkLoop;
-            root: ShadowRoot;
             currRepresentation: IHTMLRepresentation[];
             lastChanges: IElementChange[] = [];
             virtualDom: IHTMLRepresentation[];
@@ -26,16 +25,13 @@ export function Component({ selector, template }: { selector: string, template: 
             constructor( ) {
                 super();
                 target.call(this);
-                this.root = this.attachShadow({ mode: "closed" });
                 this.virtualDom = this.vDomBuilder.createVirtualDom(template);
                 this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);
                 this.realDom = this.vDomBuilder.createRealDom(this.currRepresentation, this);
-                this.root.appendChild(this.realDom);
-                this.innerHTML = "";
+                this.appendChild(this.realDom);
             }
 
             update() {
-                if (!this.root) { return; }
                 this.workLoop.pushWork(() => {
                     const { newState, changes } = this.vDomBuilder.update(this, this.virtualDom, this.currRepresentation);
                     this.currRepresentation = newState;
@@ -45,7 +41,7 @@ export function Component({ selector, template }: { selector: string, template: 
             }
             
             updateView() {
-                this.vDomBuilder.updateHTML(this.root.children[0].children, this.lastChanges);
+                this.vDomBuilder.updateHTML(this.children[0].children, this.lastChanges);
             }
         }
 

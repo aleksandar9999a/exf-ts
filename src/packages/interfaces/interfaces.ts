@@ -1,5 +1,5 @@
 export interface IComponentDecorator {
-    root: ShadowRoot;
+    // root: ShadowRoot;
     currRepresentation: IHTMLRepresentation[];
     virtualDom: IHTMLRepresentation[];
     realDom: HTMLElement;
