@@ -6,6 +6,13 @@ export interface IComponentDecorator {
     update: () => void;
 }
 
+export interface IVirtualDomBuilder {
+    createVirtualDom: (html: string) => IHTMLRepresentation[],
+    createRealDom: (vDom: IHTMLRepresentation[], context: any) => HTMLElement,
+    createState: (vDom: IHTMLRepresentation[], context: any) => IHTMLRepresentation[],
+    update: (context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) => IHTMLRepresentation[]
+}
+
 export interface IHTMLRepresentation {
     tag: string,
     attributes: { name: string, value: any }[],
