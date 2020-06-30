@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import './packages';
 import './App'
 import './components/About';
