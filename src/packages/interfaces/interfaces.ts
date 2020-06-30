@@ -10,7 +10,12 @@ export interface IVirtualDomBuilder {
     createVirtualDom: (html: string) => IHTMLRepresentation[],
     createRealDom: (vDom: IHTMLRepresentation[], context: any) => HTMLElement,
     createState: (vDom: IHTMLRepresentation[], context: any) => IHTMLRepresentation[],
-    update: (context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) => IHTMLRepresentation[]
+    updateHTML: (childrens: HTMLCollection, map: IElementChange[]) => void,
+    update: (context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) => { newState: IHTMLRepresentation[], changes: IElementChange[] }
+}
+
+export interface IWorkLoop {
+    pushWork: (work: Function) => void;
 }
 
 export interface IHTMLRepresentation {
@@ -28,4 +33,24 @@ interface IChange {
 export interface IElementChange {
     index: number,
     changes: IChange[]
+}
+
+
+type RequestIdleCallbackHandle = any;
+type RequestIdleCallbackOptions = {
+    timeout: number;
+};
+type RequestIdleCallbackDeadline = {
+    readonly didTimeout: boolean;
+    timeRemaining: (() => number);
+};
+
+declare global {
+    interface Window {
+        requestIdleCallback: ((
+            callback: ((deadline: RequestIdleCallbackDeadline) => void),
+            opts?: RequestIdleCallbackOptions,
+        ) => RequestIdleCallbackHandle);
+        cancelIdleCallback: ((handle: RequestIdleCallbackHandle) => void);
+    }
 }
