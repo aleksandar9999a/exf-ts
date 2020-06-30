@@ -12,5 +12,6 @@ export function Inject(selector: string) {
     return function (target: any, key: string) {
         const service = Reflect.getMetadata(selector, container);
         target[key] = service;
+        return target;
     }
 }
