@@ -107,7 +107,7 @@ export class VirtualDomBuilder implements IVirtualDomBuilder{
         return changes;
     }
 
-    private updateHTML(childrens: HTMLCollection, map: IElementChange[]) {
+    updateHTML(childrens: HTMLCollection, map: IElementChange[]) {
         map.forEach(({ index, changes }) => {
             const currEl = childrens[index];
 
@@ -183,8 +183,6 @@ export class VirtualDomBuilder implements IVirtualDomBuilder{
     update(context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) {
         const newState = this.createState(vDom, context);
         const changes = this.compareStates(currState, newState);
-        const childrens = (context.root as ShadowRoot).children[0].children;
-        this.updateHTML(childrens, changes);
-        return newState;
+        return { newState, changes };
     }
 }
