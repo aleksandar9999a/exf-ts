@@ -16,6 +16,7 @@ export class RouterOutlet {
     connectedCallback() {
         this.childrens = Array.prototype.slice.call(this.outlet.children);
         this.default = this.childrens.find(child => child.getAttribute('routerLink') === '*');
+        this.outlet.innerHTML = '';
         window.addEventListener('locationchange', this.stateChangeHandler.bind(this));
         this.render();
     }
@@ -28,7 +29,6 @@ export class RouterOutlet {
     render() {
         const path = window.location.pathname;
         const child = this.childrens.find(child => child.getAttribute('routerLink') === path);
-        this.outlet.innerHTML = '';
         (this.outlet as any).root.innerHTML = '';
         
         if (child) {
