@@ -13,7 +13,6 @@ export class RouterOutlet {
         this.outlet = (this as any as HTMLElement);
         this.childrens = Array.prototype.slice.call(this.outlet.children);
         this.default = this.childrens.find(child => child.getAttribute('routerLink') === '*');
-        (this.outlet as any).innerHTML = "";
     }
 
     connectedCallback() {
@@ -28,13 +27,13 @@ export class RouterOutlet {
 
     render() {
         const path = window.location.pathname;
-        (this.outlet as any).root.innerHTML = '';
         const child = this.childrens.find(child => child.getAttribute('routerLink') === path);
+        ((this.outlet as any).root as ShadowRoot).innerHTML = '';
 
         if (child) {
-            (this.outlet as any).root.appendChild(child);
+            ((this.outlet as any).root as ShadowRoot).appendChild(child);
         } else if(this.default) {
-            (this.outlet as any).root.appendChild(this.default);
+            ((this.outlet as any).root as ShadowRoot).appendChild(this.default);
         } else {
             throw new Error('Invalid route link!');
         }
