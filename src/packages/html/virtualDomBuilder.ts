@@ -1,7 +1,9 @@
-import { IHTMLRepresentation, IElementChange } from "./../interfaces/interfaces";
+import { IHTMLRepresentation, IElementChange, IVirtualDomBuilder } from "./../interfaces/interfaces";
 import { events } from "./events-register";
+import { Injectable } from "../decorators";
 
-class VirtualDomBuilder {
+@Injectable({ selector: 'VirtualDomBuilder' })
+export class VirtualDomBuilder implements IVirtualDomBuilder{
     private state_reg = /\${\w+}/g;
     private attr_reg = /\$[\w]+/g;
 
@@ -24,24 +26,20 @@ class VirtualDomBuilder {
             currNode.tag = currEl!.tagName;
 
             const attrs = currEl.attributes;
-            if (attrs.length > 0) {
-                for (let x = 0; x < attrs.length; x++) {
-                    const attr = attrs[x];
-                    currNode.attributes.push({ name: attr.name, value: attr.value });
-                }
+            for (let x = 0; x < attrs.length; x++) {
+                const attr = attrs[x];
+                currNode.attributes.push({ name: attr.name, value: attr.value });
             }
 
             const childNodes = currEl.childNodes;
-            if (childNodes.length > 0) {
-                childNodes.forEach(el => {
-                    if (el.nodeName === '#text' && !!el.nodeValue) {
-                        currNode.content = el.nodeValue;
-                    }
-                })
+            childNodes.forEach(el => {
+                if (el.nodeName === '#text' && !!el.nodeValue) {
+                    currNode.content = el.nodeValue;
+                }
+            })
 
-                const child = this.createHyperscript(currEl.children);
-                currNode.childrens = child;
-            }
+            const child = this.createHyperscript(currEl.children);
+            currNode.childrens = child;
 
             rep.push(currNode);
         }
@@ -70,7 +68,7 @@ class VirtualDomBuilder {
         return el;
     }
 
-    private compareStates(oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[], context: any) {
+    private compareStates(oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[]) {
         let changes: IElementChange[] = [];
         newState.forEach((el, i) => {
             const oldEl = oldState[i];
@@ -95,7 +93,7 @@ class VirtualDomBuilder {
                 }
             })
 
-            const childrens = this.compareStates(oldEl.childrens, el.childrens, context);
+            const childrens = this.compareStates(oldEl.childrens, el.childrens);
             if (childrens.length > 0) {
                 change.changes.push({ name: 'childrens', value: childrens });
                 hasChange = true;
@@ -175,7 +173,7 @@ class VirtualDomBuilder {
             newEl.content = text;
 
             if (newEl.childrens.length > 0) {
-                newEl.childrens = this.createState.bind(this)(newEl.childrens, context);
+                newEl.childrens = this.createState(newEl.childrens, context);
             }
 
             return newEl;
@@ -184,11 +182,9 @@ class VirtualDomBuilder {
 
     update(context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) {
         const newState = this.createState(vDom, context);
-        const changes = this.compareStates(currState, newState, context);
+        const changes = this.compareStates(currState, newState);
         const childrens = (context.root as ShadowRoot).children[0].children;
         this.updateHTML(childrens, changes);
         return newState;
     }
 }
-
-export default new VirtualDomBuilder();
