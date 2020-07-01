@@ -54,3 +54,8 @@ declare global {
         cancelIdleCallback: ((handle: RequestIdleCallbackHandle) => void);
     }
 }
+
+export interface IStyleItem {
+    selector: string,
+    styles: { [key: string]: string }[]
+}

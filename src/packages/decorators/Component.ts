@@ -1,10 +1,10 @@
-import { IComponentDecorator, IHTMLRepresentation, IVirtualDomBuilder, IWorkLoop, IElementChange } from '../interfaces/interfaces';
+import { IComponentDecorator, IHTMLRepresentation, IVirtualDomBuilder, IWorkLoop, IElementChange, IStyleItem } from '../interfaces/interfaces';
 import { Inject } from './Injectable';
+import { createStyles } from '../styles/createStyles';
 
-export function Component({ selector, template }: { selector: string, template: string }): any {
+export function Component({ selector, template, styles }: { selector: string, template: string, styles?: IStyleItem[] }): any {
     return function componentDecorator(target: any) {
         const attributes = Reflect.getMetadata('component:attributes', target.prototype) || [];
-
 
         class BasicComponent extends HTMLElement implements IComponentDecorator {
             @Inject('VirtualDomBuilder') private vDomBuilder!: IVirtualDomBuilder;
@@ -26,10 +26,15 @@ export function Component({ selector, template }: { selector: string, template: 
             constructor() {
                 super();
                 target.call(this);
-                this.root = this.attachShadow({ mode: 'closed' })
+                this.root = this.attachShadow({ mode: 'open' })
                 this.virtualDom = this.vDomBuilder.createVirtualDom(template);
                 this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);
                 this.realDom = this.vDomBuilder.createRealDom(this.currRepresentation, this);
+
+                if (styles) {
+                    const s = createStyles(styles);
+                    (this.root as any).adoptedStyleSheets = [s];
+                }
                 this.root.appendChild(this.realDom);
             }
 
