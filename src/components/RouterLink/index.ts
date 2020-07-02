@@ -2,7 +2,7 @@ import { Component, Attribute, State } from "../../packages/decorators";
 
 @Component({
     selector: 'exf-router-link',
-    template: '<a href="javascript:;" $click="handleClick">${innerHTML}</a>'
+    template: '<a href="javascript:;" $click="this.handleClick">${this.innerHTML}</a>'
 })
 export class RouterLink {
     @Attribute to!: string;

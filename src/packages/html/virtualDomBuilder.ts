@@ -2,9 +2,15 @@ import { IHTMLRepresentation, IElementChange, IVirtualDomBuilder } from "./../in
 import { events } from "./events-register";
 import { Injectable } from "../decorators";
 
+function bindedCompileTemplateString(str: string, context: any, stringify?: boolean) {
+    if(stringify) {
+        return new Function('return `' + str + '`;').bind(context)();
+    }
+    return new Function('return ' + str + ';').bind(context)();
+}
+
 @Injectable({ selector: 'VirtualDomBuilder' })
 export class VirtualDomBuilder implements IVirtualDomBuilder{
-    private state_reg = /\${\w+}/g;
     private attr_reg = /\$[\w]+/g;
 
     private createElement(type: string, content?: any): HTMLElement {
@@ -150,28 +156,13 @@ export class VirtualDomBuilder implements IVirtualDomBuilder{
                 const match = newAttr.name.match(this.attr_reg);
 
                 if (match) {
-                    if (context[newAttr.value] !== undefined) {
-                        newAttr.value = context[newAttr.value];
-                    }
+                    newAttr.value = bindedCompileTemplateString(newAttr.value, context);
                 }
 
                 return newAttr;
             })
 
-            let text = newEl.content;
-            let textMatch = text.match(this.state_reg);
-
-            if (textMatch) {
-                textMatch.forEach(match => {
-                    const index = text.indexOf(match);
-                    let realText = match.slice(2, match.length - 1);
-                    if (context[realText] !== undefined) {
-                        text = text.slice(0, index) + context[realText] + text.slice(index + match.length);
-                    }
-                })
-            }
-
-            newEl.content = text;
+            newEl.content = bindedCompileTemplateString(newEl.content, context, true);
 
             if (newEl.childrens.length > 0) {
                 newEl.childrens = this.createState(newEl.childrens, context);

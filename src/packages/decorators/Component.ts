@@ -35,6 +35,7 @@ export function Component({ selector, template, styles }: { selector: string, te
                     const s = createStyles(styles);
                     (this.root as any).adoptedStyleSheets = [s];
                 }
+                
                 this.root.appendChild(this.realDom);
             }
 

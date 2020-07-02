@@ -12,8 +12,7 @@
         <exf-not-found routerLink="*"></exf-not-found>
     </exf-router-outlet>
     <div>
-        <input $value="text" $input="handleInput"/>
-        <p>${text}</p>
+        <input $value="this.text" $input="(e) => { this.text = e.target.value; }"/>
+        <p>${this.text}</p>
     </div>
-   
 </div>
