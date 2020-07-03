@@ -5,6 +5,7 @@ import { About } from "./components/About";
 import { Contacts } from "./components/Contacts";
 import { App } from "./App";
 import { Home } from "./components/Home/Home";
+import { Test } from "./components/Test";
 
 
 export default ExFModule({
@@ -13,6 +14,7 @@ export default ExFModule({
         RouterOutlet,
         App,
         About,
+        Test,
         Contacts,
         Home
     ]
