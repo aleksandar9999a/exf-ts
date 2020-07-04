@@ -28,7 +28,7 @@ export function Component({ selector, template, styles }: { selector: string, te
                 target.call(this);
                 this.root = this.attachShadow({ mode: 'open' })
                 this.virtualDom = this.vDomBuilder.createTemplateRepresentation(template);
-                this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);                
+                this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);    
                 this.realDom = this.vDomBuilder.createRealDom(this.currRepresentation, this);
 
                 if (styles) {
@@ -49,7 +49,7 @@ export function Component({ selector, template, styles }: { selector: string, te
             }
 
             updateView() {
-                this.vDomBuilder.updateHTML(this.root.children[0].childNodes, this.lastChanges);
+                this.vDomBuilder.updateHTML(this.root.childNodes[0], this.root.children[0].childNodes, this.lastChanges, this);
             }
         }
 

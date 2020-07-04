@@ -16,7 +16,7 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
 
     private attachContent(el: HTMLElement | Text, type: string, content?: any) {
         if (typeof content === "string") {
-            if(type === "text") {
+            if (type === "text") {
                 el.textContent = content;
             } else if (type === "element") {
                 (el as HTMLElement).innerHTML = content;
@@ -99,28 +99,37 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
             let hasChange = false
             let change: IElementChange = { index: i, changes: [] };
 
-            if (el.tag !== oldEl.tag) {
-                change.changes.push({ name: 'tag', value: el.tag });
-                hasChange = true;
-            }
+            if (!!oldEl && !!el) {
+                let isEdited = false;
+                for (let x = 0; x < el.attributes.length; x++) {
+                    const newAttr = el.attributes[x];
+                    const oldAttr = oldEl.attributes[i];
 
-            if(el.content !== oldEl.content) {
-                change.changes.push({ name: 'content', value: el.content as string})
-                hasChange = true;
-            }
+                    if ((!oldAttr && !!newAttr) || (!!oldAttr && !newAttr) || (oldAttr.name !== newAttr.name || oldAttr.value !== newAttr.value)) {
+                        isEdited = true;
+                        break;
+                    }
+                }
 
-            el.attributes.forEach(({ name, value }, i) => {
-                const oldAttr = oldEl.attributes[i];
-                if (oldAttr.name !== name || oldAttr.value !== value) {
-                    change.changes.push({ name: 'attributes', value: { name, value } });
+                if (el.tag !== oldEl.tag || el.content !== oldEl.content) {
+                    isEdited = true;
+                }
+
+                if (isEdited) {
+                    change.changes.push({ name: 'editElement', value: el });
                     hasChange = true;
                 }
-            })
 
-            const childrens = this.compareStates(oldEl.childrens, el.childrens);
-            if (childrens.length > 0) {
-                change.changes.push({ name: 'childrens', value: childrens });
+                const childrens = this.compareStates(oldEl.childrens, el.childrens);
+                if (childrens.length > 0) {
+                    change.changes.push({ name: 'loopChanges', value: childrens });
+                    hasChange = true;
+                }
+            } else if (!oldEl && !!el) {
+                change.changes.push({ name: 'addElement', value: el });
                 hasChange = true;
+            } else if (!!oldEl && !el) {
+                change.changes.push({ name: 'removeElement', value: oldEl });
             }
 
             if (hasChange) {
@@ -131,25 +140,66 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
         return changes;
     }
 
-    updateHTML(childrens: NodeListOf<ChildNode>, map: IElementChange[]) {
+    private editElement(context: any, parent: ChildNode, currEl: ChildNode, newEl: IHTMLRepresentation) {
+        const el = this.createDomElement(context, newEl);
+        if(!currEl) {
+            parent.appendChild(el);
+        } else {
+            if ((currEl as HTMLElement).tagName !== (el as HTMLElement).tagName) {
+                currEl.replaceWith(el);
+            } else {
+                if(currEl.textContent !== el.textContent) {
+                    currEl.textContent = el.textContent;
+                }
+    
+                let currAttrs = (currEl as HTMLElement).attributes;
+                let newAttrs = (el as HTMLElement).attributes;
+    
+                if(!currAttrs || !newAttrs) {
+                    return;
+                }
+    
+                for (let i = 0; i < newAttrs.length; i++) {
+                    const newAttr = newAttrs[i];
+                    const currAttr = currAttrs[i];
+    
+                    if(newAttr.name !== currAttr.name || newAttr.value !== currAttr.value ) {
+                        (currEl as HTMLElement).setAttribute(newAttr.name, newAttr.value);
+                    }
+                }
+            }
+        }
+    }
+
+    private addElement(context: any, parent: ChildNode, newEl: IHTMLRepresentation) {
+        const el = this.createDomElement(context, newEl);
+        if (!(parent as HTMLElement).tagName) {
+            parent.replaceWith(el);
+        } else {
+            parent.appendChild(el);
+        }
+    }
+
+    private removeElement(el: ChildNode) {
+        console.log(el);
+        
+        el.remove();
+    }
+
+    updateHTML(parent: ChildNode, childrens: NodeListOf<ChildNode>, map: IElementChange[], context: any) {
         map.forEach(({ index, changes }) => {
             let currEl = childrens[index];
 
             changes.forEach((({ name, value }: any) => {
-                if (name === 'tag') {
-                    const newE = this.createElement(value);
-                    currEl.replaceWith(newE);
-                } else if (name === 'attributes') {
-                    let name = value.name;
-                    if (name.match(this.attr_reg)) {
-                        name = name.slice(1);
-                    }
-                    (currEl as HTMLElement).setAttribute(name, value.value);
-                } else if (name === 'childrens') {
-                    this.updateHTML(currEl.childNodes, value);
-                } else if (name === 'content') {
-                    currEl.textContent = value;
-                }
+                if (name === 'editElement') {
+                    this.editElement(context, parent, currEl, value);
+                } else if (name === 'addElement') {
+                    this.addElement(context, parent, value);
+                } else if (name === 'removeElement') {
+                    this.removeElement(value);
+                } else if (name === 'loopChanges') {
+                    this.updateHTML(currEl, currEl.childNodes, value, context);
+                } 
             }))
         })
     }
@@ -165,28 +215,41 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
     }
 
     createState(vDom: IHTMLRepresentation[], context: any) {
-        return vDom.map(element => {
+        let state: IHTMLRepresentation[] = [];
+
+        for (let i = 0; i < vDom.length; i++) {
+            const element = vDom[i];
             let newEl = Object.assign({}, element);
+
             newEl.attributes = newEl.attributes.map(attr => {
                 let newAttr = Object.assign({}, attr);
                 const match = newAttr.name.match(this.attr_reg);
-
-                if (match) {
-                    newAttr.value = this.bindedCompileTemplateString(newAttr.value, context);
-                }
-
+                if (match) { newAttr.value = this.bindedCompileTemplateString(newAttr.value, context); }
                 return newAttr;
             })
 
-            if(newEl.content) {
-                newEl.content = this.bindedCompileTemplateString(newEl.content, context, true);
+            if (newEl.content) {
+                let content = this.bindedCompileTemplateString(newEl.content, context, true);
+                let c = this.createElement('div', content);
+                let arr = Array.prototype.slice.call(c.childNodes).filter(c => c.nodeName !== '#text');
+
+                if (arr.length > 0) {
+                    let rep = this.createHyperscript(arr as any as NodeListOf<ChildNode>);
+                    vDom = [...vDom.slice(0, i), ...rep, ...vDom.slice(i + 1)];
+                    newEl = rep[0];
+                } else {
+                    newEl.content = content;
+                }
             }
 
             if (newEl.childrens.length > 0) {
                 newEl.childrens = this.createState(newEl.childrens, context);
             }
-            return newEl;
-        })
+
+            state.push(newEl);
+        }
+
+        return state;
     }
 
     update(context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) {
