@@ -1,16 +1,16 @@
 export interface IComponentDecorator {
-    // root: ShadowRoot;
+    root: ShadowRoot;
     currRepresentation: IHTMLRepresentation[];
     virtualDom: IHTMLRepresentation[];
-    realDom: HTMLElement;
+    realDom: HTMLElement | Text;
     update: () => void;
 }
 
 export interface IVirtualDomBuilder {
     createTemplateRepresentation: (html: string) => IHTMLRepresentation[],
-    createRealDom: (vDom: IHTMLRepresentation[], context: any) => HTMLElement,
+    createRealDom: (vDom: IHTMLRepresentation[], context: any) => HTMLElement | Text,
     createState: (vDom: IHTMLRepresentation[], context: any) => IHTMLRepresentation[],
-    updateHTML: (childrens: HTMLCollection, map: IElementChange[]) => void,
+    updateHTML: (childrens: NodeListOf<ChildNode>, map: IElementChange[]) => void,
     update: (context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) => { newState: IHTMLRepresentation[], changes: IElementChange[] }
 }
 
@@ -22,7 +22,7 @@ export interface IHTMLRepresentation {
     tag: string,
     attributes: { name: string, value: any }[],
     childrens: IHTMLRepresentation[],
-    content: string
+    content?: string
 }
 
 interface IChange {

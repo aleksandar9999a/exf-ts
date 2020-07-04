@@ -2,58 +2,76 @@ import { IHTMLRepresentation, IElementChange, IVirtualDomBuilder } from "./../in
 import { events } from "./events-register";
 import { Injectable } from "../decorators";
 
-function bindedCompileTemplateString(str: string, context: any, stringify?: boolean) {
-    if (stringify) {
-        return new Function('return `' + str + '`;').bind(context)();
-    }
-    return new Function('return ' + str + ';').bind(context)();
-}
-
 @Injectable({ selector: 'VirtualDomBuilder' })
 export class VirtualDomBuilder implements IVirtualDomBuilder {
     private attr_reg = /\$[\w]+/g;
 
-    private createElement(type: string, content?: any): HTMLElement {
-        let e = document.createElement(type);
+    private bindedCompileTemplateString(str: string, context: any, stringify?: boolean) {
+        if (stringify) {
+            return new Function('return `' + str + '`;').bind(context)();
+        } else {
+            return new Function('return ' + str + ';').bind(context)();
+        }
+    }
+
+    private attachContent(el: HTMLElement | Text, type: string, content?: any) {
         if (typeof content === "string") {
-            e.innerHTML = content;
+            if(type === "text") {
+                el.textContent = content;
+            } else if (type === "element") {
+                (el as HTMLElement).innerHTML = content;
+            }
+        }
+        if (Array.isArray(content)) {
+            content.forEach(c => this.attachContent(el, c));
         }
         if (typeof content === "object") {
-            e.appendChild(content);
+            el.appendChild(content);
         }
+    }
 
+    private createElement(type: string, content?: any): HTMLElement | Text {
+        let e: HTMLElement | Text;
+        let t = 'element';
+        if (type.includes("#")) {
+            e = document.createTextNode(content);
+            t = 'text';
+        } else {
+            e = document.createElement(type);
+        }
+        this.attachContent(e, t, content);
         return e;
     }
 
-    private createHyperscript(elements: HTMLCollection): IHTMLRepresentation[] {
+    private createHyperscript(elements: NodeListOf<ChildNode>): IHTMLRepresentation[] {
         let rep: IHTMLRepresentation[] = [];
         for (let i = 0; i < elements.length; i++) {
-            let currNode: IHTMLRepresentation = { tag: '', attributes: [], childrens: [], content: '' };
+            let currNode: IHTMLRepresentation = { tag: '', attributes: [], childrens: [] };
             const currEl = elements[i];
-            currNode.tag = currEl!.tagName;
+            currNode.tag = currEl.nodeName;
 
-            const attrs = currEl.attributes;
-            for (let x = 0; x < attrs.length; x++) {
-                const attr = attrs[x];
-                currNode.attributes.push({ name: attr.name, value: attr.value });
+            const attrs = (currEl as any).attributes as NamedNodeMap;
+            if (currNode.tag !== "#text" && !!attrs) {
+                for (let x = 0; x < attrs.length; x++) {
+                    const attr = attrs[x];
+                    currNode.attributes.push({ name: attr.name, value: attr.value });
+                }
             }
 
-            const childNodes = currEl.childNodes;
-            childNodes.forEach(el => {
-                if (el.nodeName === '#text' && !!el.nodeValue) {
-                    currNode.content = el.nodeValue;
-                }
-            })
+            if (currNode.tag.includes("#")) {
+                currNode.content = currEl.textContent as string;
+            }
 
-            const child = this.createHyperscript(currEl.children);
-            currNode.childrens = child;
+            const child = this.createHyperscript(currEl.childNodes);
+            currNode.childrens = child.filter(c => c.tag !== '#comment').filter(c => !(c.tag === "#text" && c.content?.trim().length === 0));
 
             rep.push(currNode);
         }
         return rep;
     }
 
-    private createDomElement(context: any, { tag, attributes, childrens, content }: IHTMLRepresentation) {
+    private createDomElement(context: any, element: IHTMLRepresentation) {
+        const { tag, attributes, childrens, content } = element;
         const el = this.createElement(tag, content);
 
         attributes.forEach(({ name, value }) => {
@@ -63,15 +81,14 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
                 if (typeof value === 'function' && events[attr]) {
                     el.addEventListener(attr, value.bind(context));
                 } else {
-                    el.setAttribute(attr, value);
+                    (el as HTMLElement).setAttribute(attr, value);
                 }
             } else {
-                el.setAttribute(name, value);
+                (el as HTMLElement).setAttribute(name, value);
             }
         })
 
         childrens.map(this.createDomElement.bind(this, context)).forEach(child => el.appendChild(child));
-
         return el;
     }
 
@@ -87,8 +104,8 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
                 hasChange = true;
             }
 
-            if (el.content !== oldEl.content) {
-                change.changes.push({ name: 'content', value: el.content });
+            if(el.content !== oldEl.content) {
+                change.changes.push({ name: 'content', value: el.content as string})
                 hasChange = true;
             }
 
@@ -114,9 +131,9 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
         return changes;
     }
 
-    updateHTML(childrens: HTMLCollection, map: IElementChange[]) {
+    updateHTML(childrens: NodeListOf<ChildNode>, map: IElementChange[]) {
         map.forEach(({ index, changes }) => {
-            const currEl = childrens[index];
+            let currEl = childrens[index];
 
             changes.forEach((({ name, value }: any) => {
                 if (name === 'tag') {
@@ -127,11 +144,11 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
                     if (name.match(this.attr_reg)) {
                         name = name.slice(1);
                     }
-                    currEl.setAttribute(name, value.value);
-                } else if (name === 'content') {
-                    currEl.innerHTML = value;
+                    (currEl as HTMLElement).setAttribute(name, value.value);
                 } else if (name === 'childrens') {
-                    this.updateHTML(currEl.children, value);
+                    this.updateHTML(currEl.childNodes, value);
+                } else if (name === 'content') {
+                    currEl.textContent = value;
                 }
             }))
         })
@@ -139,35 +156,35 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
 
     createTemplateRepresentation(html: string): IHTMLRepresentation[] {
         const temp = this.createElement('template', html) as HTMLTemplateElement;
-        const vDom = this.createHyperscript(temp.content.children);
+        const vDom = this.createHyperscript(temp.content.childNodes);
         return vDom;
     }
 
-    createRealDom(vDom: IHTMLRepresentation[], context: any): HTMLElement {
-        return this.createDomElement(context, { tag: 'div', attributes: [], childrens: vDom, content: '' })
+    createRealDom(vDom: IHTMLRepresentation[], context: any): HTMLElement | Text {
+        return this.createDomElement(context, { tag: 'div', attributes: [], childrens: vDom })
     }
 
     createState(vDom: IHTMLRepresentation[], context: any) {
         return vDom.map(element => {
             let newEl = Object.assign({}, element);
-
             newEl.attributes = newEl.attributes.map(attr => {
                 let newAttr = Object.assign({}, attr);
                 const match = newAttr.name.match(this.attr_reg);
 
                 if (match) {
-                    newAttr.value = bindedCompileTemplateString(newAttr.value, context);
+                    newAttr.value = this.bindedCompileTemplateString(newAttr.value, context);
                 }
 
                 return newAttr;
             })
 
-            newEl.content = bindedCompileTemplateString(newEl.content, context, true);
+            if(newEl.content) {
+                newEl.content = this.bindedCompileTemplateString(newEl.content, context, true);
+            }
 
             if (newEl.childrens.length > 0) {
                 newEl.childrens = this.createState(newEl.childrens, context);
             }
-
             return newEl;
         })
     }

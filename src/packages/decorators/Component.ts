@@ -6,14 +6,14 @@ export function Component({ selector, template, styles }: { selector: string, te
     return function componentDecorator(target: any) {
         const attributes = Reflect.getMetadata('component:attributes', target.prototype) || [];
 
-        class BasicComponent extends HTMLElement implements IComponentDecorator {
+        class BasicComponent extends HTMLElement implements IComponentDecorator{
             @Inject('VirtualDomBuilder') private vDomBuilder!: IVirtualDomBuilder;
             @Inject('WorkLoop') private workLoop!: IWorkLoop;
             root: ShadowRoot;
             currRepresentation: IHTMLRepresentation[];
             lastChanges: IElementChange[] = [];
             virtualDom: IHTMLRepresentation[];
-            realDom: HTMLElement | HTMLTemplateElement;
+            realDom: HTMLElement | Text;
 
             static get observedAttributes() {
                 return attributes;
@@ -28,7 +28,7 @@ export function Component({ selector, template, styles }: { selector: string, te
                 target.call(this);
                 this.root = this.attachShadow({ mode: 'open' })
                 this.virtualDom = this.vDomBuilder.createTemplateRepresentation(template);
-                this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);
+                this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);                
                 this.realDom = this.vDomBuilder.createRealDom(this.currRepresentation, this);
 
                 if (styles) {
@@ -49,7 +49,7 @@ export function Component({ selector, template, styles }: { selector: string, te
             }
 
             updateView() {
-                this.vDomBuilder.updateHTML(this.root.children[0].children, this.lastChanges);
+                this.vDomBuilder.updateHTML(this.root.children[0].childNodes, this.lastChanges);
             }
         }
 
