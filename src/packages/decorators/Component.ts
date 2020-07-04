@@ -27,7 +27,7 @@ export function Component({ selector, template, styles }: { selector: string, te
                 super();
                 target.call(this);
                 this.root = this.attachShadow({ mode: 'open' })
-                this.virtualDom = this.vDomBuilder.createVirtualDom(template);
+                this.virtualDom = this.vDomBuilder.createTemplateRepresentation(template);
                 this.currRepresentation = this.vDomBuilder.createState(this.virtualDom, this);
                 this.realDom = this.vDomBuilder.createRealDom(this.currRepresentation, this);
 

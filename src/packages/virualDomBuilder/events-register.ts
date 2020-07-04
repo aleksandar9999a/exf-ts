@@ -2,7 +2,7 @@ type TEvents = {
     [key: string]: string
 }
 
-export const events: TEvents = {
+export let events: TEvents = {
     abort: 'abort',
     animationend: 'animationend',
     animationiteration: 'animationiteration',
@@ -89,4 +89,8 @@ export const events: TEvents = {
     webkitanimationstart: 'webkitanimationstart',
     webkittransitionend: 'webkittransitionend',
     wheel: 'wheel'
+}
+
+export function addEvent(name: string, value: string) {
+    events[name] = value;
 }

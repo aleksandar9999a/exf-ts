@@ -3,14 +3,14 @@ import { events } from "./events-register";
 import { Injectable } from "../decorators";
 
 function bindedCompileTemplateString(str: string, context: any, stringify?: boolean) {
-    if(stringify) {
+    if (stringify) {
         return new Function('return `' + str + '`;').bind(context)();
     }
     return new Function('return ' + str + ';').bind(context)();
 }
 
 @Injectable({ selector: 'VirtualDomBuilder' })
-export class VirtualDomBuilder implements IVirtualDomBuilder{
+export class VirtualDomBuilder implements IVirtualDomBuilder {
     private attr_reg = /\$[\w]+/g;
 
     private createElement(type: string, content?: any): HTMLElement {
@@ -137,7 +137,7 @@ export class VirtualDomBuilder implements IVirtualDomBuilder{
         })
     }
 
-    createVirtualDom(html: string): IHTMLRepresentation[] {
+    createTemplateRepresentation(html: string): IHTMLRepresentation[] {
         const temp = this.createElement('template', html) as HTMLTemplateElement;
         const vDom = this.createHyperscript(temp.content.children);
         return vDom;

@@ -7,7 +7,7 @@ export interface IComponentDecorator {
 }
 
 export interface IVirtualDomBuilder {
-    createVirtualDom: (html: string) => IHTMLRepresentation[],
+    createTemplateRepresentation: (html: string) => IHTMLRepresentation[],
     createRealDom: (vDom: IHTMLRepresentation[], context: any) => HTMLElement,
     createState: (vDom: IHTMLRepresentation[], context: any) => IHTMLRepresentation[],
     updateHTML: (childrens: HTMLCollection, map: IElementChange[]) => void,
