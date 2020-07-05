@@ -10,8 +10,22 @@ export interface IVirtualDomBuilder {
     createTemplateRepresentation: (html: string) => IHTMLRepresentation[],
     createRealDom: (vDom: IHTMLRepresentation[], context: any) => HTMLElement | Text,
     createState: (vDom: IHTMLRepresentation[], context: any) => IHTMLRepresentation[],
-    updateHTML: (parent: ChildNode, childrens: NodeListOf<ChildNode>, map: IElementChange[], context: any) => void,
+    updateHTML: (arg: IUpdateHTML) => void,
     update: (context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) => { newState: IHTMLRepresentation[], changes: IElementChange[] }
+}
+
+export interface IUpdateHTML {
+    parent: ChildNode,
+    childrens: NodeListOf<ChildNode>,
+    map: IElementChange[],
+    context: any
+}
+
+export interface IMainVDomArguments {
+    context: any,
+    parent?: ChildNode,
+    element: ChildNode,
+    value: IHTMLRepresentation | IChange | string
 }
 
 export interface IWorkLoop {

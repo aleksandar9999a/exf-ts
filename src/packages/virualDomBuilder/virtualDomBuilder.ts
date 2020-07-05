@@ -1,6 +1,18 @@
-import { IHTMLRepresentation, IElementChange, IVirtualDomBuilder, IChange } from "./../interfaces/interfaces";
+import { IHTMLRepresentation, IElementChange, IVirtualDomBuilder, IChange, IWorkLoop, IUpdateHTML, IMainVDomArguments } from "./../interfaces/interfaces";
 import { events } from "./events-register";
 import { Injectable } from "../decorators";
+
+function comments(c: IHTMLRepresentation) {
+    return c.tag !== '#comment'
+}
+
+function emptyText(c: IHTMLRepresentation) {
+    return !(c.tag === "#text" && c.content?.trim().length === 0);
+}
+
+function filterElements(c: IHTMLRepresentation) {
+    return comments(c) || emptyText(c);
+}
 
 @Injectable({ selector: 'VirtualDomBuilder' })
 export class VirtualDomBuilder implements IVirtualDomBuilder {
@@ -21,9 +33,6 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
             } else if (type === "element") {
                 (el as HTMLElement).innerHTML = content;
             }
-        }
-        if (Array.isArray(content)) {
-            content.forEach(c => this.attachContent(el, c));
         }
         if (typeof content === "object") {
             el.appendChild(content);
@@ -58,12 +67,10 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
                 }
             }
 
-            if (currNode.tag.includes("#")) {
-                currNode.content = currEl.textContent as string;
-            }
+            if (currNode.tag.includes("#") && !!currEl.textContent) { currNode.content = currEl.textContent; }
 
             const child = this.createHyperscript(currEl.childNodes);
-            currNode.childrens = child.filter(c => c.tag !== '#comment').filter(c => !(c.tag === "#text" && c.content?.trim().length === 0));
+            currNode.childrens = child.filter(filterElements);
 
             rep.push(currNode);
         }
@@ -72,22 +79,8 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
 
     private createDomElement(context: any, element: IHTMLRepresentation) {
         const { tag, attributes, childrens, content } = element;
-        const el = this.createElement(tag, content);
-
-        attributes.forEach(({ name, value }) => {
-            const match = name.match(this.attr_reg);
-            if (match) {
-                const attr = name.slice(1);
-                if (typeof value === 'function' && events[attr]) {
-                    el.addEventListener(attr, value.bind(context));
-                } else {
-                    (el as HTMLElement).setAttribute(attr, value);
-                }
-            } else {
-                (el as HTMLElement).setAttribute(name, value);
-            }
-        })
-
+        const el = this.createElement(tag, content) as ChildNode;
+        attributes.forEach(value => this.editAttribute({ context, element: el, value }));
         childrens.map(this.createDomElement.bind(this, context)).forEach(child => el.appendChild(child));
         return el;
     }
@@ -97,10 +90,8 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
         const secondAttrs = secondEl.attributes;
         let changes: IChange[] = [];
 
-        for (let x = 0; x < firstAttrs.length; x++) {
-            const currAttr = firstAttrs[x];
+        firstAttrs.forEach(currAttr => {
             const findedAttr = secondAttrs.find(attr => attr.name === currAttr.name);
-
             if (findedAttr && findedAttr.value !== currAttr.value) {
                 if (currAttr.name === 'key') {
                     changes = [...changes, { name: 'replacedElement', value: secondEl }]
@@ -108,7 +99,7 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
                     changes = [...changes, { name: 'editAttribute', value: findedAttr }];
                 }
             }
-        }
+        })
 
         return changes;
     }
@@ -200,67 +191,60 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
         return changes;
     }
 
-    private editAttribute(context: any, currEl: ChildNode, { name, value }: { name: string, value: any }) {
-        const match = name.match(this.attr_reg);
+    private editAttribute({ context, element, value }: IMainVDomArguments) {
+        const match = (value as IChange).name.match(this.attr_reg);
 
         if (match) {
-            const attr = name.slice(1);
-            if (typeof value === 'function' && events[attr]) {
-                currEl.addEventListener(attr, value.bind(context));
+            const attr = (value as IChange).name.slice(1);
+            if (typeof (value as IChange).value === 'function' && events[attr]) {
+                element.addEventListener(attr, (value as IChange).value.bind(context));
             } else {
-                (currEl as HTMLElement).setAttribute(attr, value);
+                (element as HTMLElement).setAttribute(attr, (value as IChange).value);
             }
         } else {
-            (currEl as HTMLElement).setAttribute(name, value);
+            (element as HTMLElement).setAttribute((value as IChange).name, (value as IChange).value);
         }
     }
 
-    private replacedName(currEl: ChildNode, value: string) {
-        currEl.textContent = value;
+    private replacedName({ element, value }: IMainVDomArguments) {
+        element.textContent = value as string;
     }
 
-    private replacedElement(context: any, currEl: ChildNode, value: IHTMLRepresentation) {
-        const e = this.createDomElement(context, value);
-        currEl.replaceWith(e);
+    private replacedElement({ context, element, value }: IMainVDomArguments) {
+        const e = this.createDomElement(context, value as IHTMLRepresentation);
+        element.replaceWith(e);
     }
 
-    private addElement(context: any, parent: ChildNode, newEl: IHTMLRepresentation) {
-        const el = this.createDomElement(context, newEl);
+    private addElement({ context, parent, value }: IMainVDomArguments) {
+        const el = this.createDomElement(context, value as IHTMLRepresentation);
         if (!(parent as HTMLElement).tagName) {
-            parent.replaceWith(el);
+            parent!.replaceWith(el);
         } else {
-            parent.appendChild(el);
+            parent!.appendChild(el);
         }
     }
 
-    private removeElement(currEl: ChildNode, key: { name: string, value: string }) {
-        const currKey = (currEl as HTMLElement).attributes.getNamedItem('key');
+    private removeElement({ element, value }: IMainVDomArguments) {
+        const currKey = (element as HTMLElement).attributes.getNamedItem('key');
         if (!currKey) {
             console.error('It is requared to set key attribute!');
-        } else if (currKey.value !== key.value) {
+        } else if (currKey.value !== (value as IChange).value) {
             throw new Error("Current element key is different from provided!"); 7
         }
 
-        currEl.remove();
+        element.remove();
     }
 
-    updateHTML(parent: ChildNode, childrens: NodeListOf<ChildNode>, map: IElementChange[], context: any) {
+    updateHTML({ parent, childrens, map, context }: IUpdateHTML) {
         map.forEach(({ index, changes }) => {
-            let currEl = childrens[index];
-
+            let element = childrens[index];
             changes.forEach((({ name, value }: any) => {
-                if (name === 'editAttribute') {
-                    this.editAttribute(context, currEl, value);
-                } else if (name === 'replacedName') {
-                    this.replacedName(currEl, value);
-                } else if (name === 'replacedElement') {
-                    this.replacedElement(context, currEl, value);
-                } else if (name === 'addElement') {
-                    this.addElement(context, parent, value);
-                } else if (name === 'removeElement') {
-                    this.removeElement(currEl, value);
+                if (typeof (this as any)[name] === 'function') {
+                    (this as any)[name]({ context, parent, element, value });
                 } else if (name === 'loopChanges') {
-                    this.updateHTML(currEl, currEl.childNodes, value, context);
+                    this.updateHTML({ parent: element, childrens: element.childNodes, map: value, context });
+                } else {
+                    throw new Error(`Method ${name} is unknown!`);
                 }
             }))
         })
@@ -273,7 +257,7 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
     }
 
     createRealDom(vDom: IHTMLRepresentation[], context: any): HTMLElement | Text {
-        return this.createDomElement(context, { tag: 'div', attributes: [], childrens: vDom })
+        return this.createDomElement(context, { tag: 'div', attributes: [], childrens: vDom }) as HTMLElement | Text;
     }
 
     createState(vDom: IHTMLRepresentation[], context: any) {

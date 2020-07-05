@@ -49,7 +49,7 @@ export function Component({ selector, template, styles }: { selector: string, te
             }
 
             updateView() {
-                this.vDomBuilder.updateHTML(this.root.childNodes[0], this.root.children[0].childNodes, this.lastChanges, this);
+                this.vDomBuilder.updateHTML({ parent: this.root.childNodes[0], childrens: this.root.children[0].childNodes, map: this.lastChanges, context: this });
             }
         }
 
