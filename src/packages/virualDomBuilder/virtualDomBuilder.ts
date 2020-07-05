@@ -1,4 +1,4 @@
-import { IHTMLRepresentation, IElementChange, IVirtualDomBuilder } from "./../interfaces/interfaces";
+import { IHTMLRepresentation, IElementChange, IVirtualDomBuilder, IChange } from "./../interfaces/interfaces";
 import { events } from "./events-register";
 import { Injectable } from "../decorators";
 
@@ -92,83 +92,136 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
         return el;
     }
 
+    private compareAttributes(firstEl: IHTMLRepresentation, secondEl: IHTMLRepresentation) {
+        const firstAttrs = firstEl.attributes;
+        const secondAttrs = secondEl.attributes;
+        let changes: IChange[] = [];
+
+        for (let x = 0; x < firstAttrs.length; x++) {
+            const currAttr = firstAttrs[x];
+            const findedAttr = secondAttrs.find(attr => attr.name === currAttr.name);
+
+            if (findedAttr && findedAttr.value !== currAttr.value) {
+                if (currAttr.name === 'key') {
+                    changes = [...changes, { name: 'replacedElement', value: secondEl }]
+                } else {
+                    changes = [...changes, { name: 'editAttribute', value: findedAttr }];
+                }
+            }
+        }
+
+        return changes;
+    }
+
+    private compareTags(first: IHTMLRepresentation, second: IHTMLRepresentation) {
+        return first.tag !== second.tag ? [{ name: 'replacedElement', value: second }] : [];
+    }
+
+    private compareContent(firstEl: IHTMLRepresentation, secondEl: IHTMLRepresentation) {
+        return firstEl.content !== secondEl.content ? [{ name: 'replacedName', value: secondEl.content }] : [];
+    }
+
+    private compareChildrens(oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[]) {
+        let childrens = this.compareStates(oldState, newState);
+        return childrens.length > 0 ? [{ name: 'loopChanges', value: childrens }] : [];
+    }
+
+    private compareTwoElements(firstEl: IHTMLRepresentation, secondEl: IHTMLRepresentation, stateLenght: string) {
+        let changes: IChange[] = [];
+        let elements = {
+            first: firstEl,
+            second: secondEl
+        }
+
+        if (stateLenght === 'oldState') {
+            elements = {
+                first: secondEl,
+                second: firstEl
+            }
+        }
+
+        if (!elements.first && !!elements.second && (stateLenght === 'newState' || stateLenght === "equal")) {
+            changes = [...changes, { name: 'addElement', value: elements.second }];
+            return changes;
+        }
+
+        if (!!elements.first && !elements.second && stateLenght === 'oldState') {
+            const key = elements.first.attributes.find(attr => attr.name === 'key')
+            changes = [...changes, { name: 'removeElement', value: key }];
+            return changes;
+        }
+
+        if (!!elements.first && !!elements.second) {
+            const tags = this.compareTags(elements.first, elements.second)
+            changes = [...changes, ...tags];
+            if (tags.length > 0) { return changes; }
+        }
+
+        if (!!elements.first && !!elements.second) {
+            changes = [
+                ...changes,
+                ...this.compareAttributes(elements.first, elements.second),
+                ...this.compareContent(elements.first, elements.second),
+                ...this.compareChildrens(elements.first.childrens, elements.second.childrens)
+            ];
+            return changes;
+        }
+
+        return changes;
+    }
+
+    private compareLength(oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[]) {
+        let state = {
+            length: 'newState',
+            shorter: oldState,
+            longer: newState
+        }
+
+        if (oldState.length > newState.length) {
+            state.length = 'oldState';
+            state.shorter = newState;
+            state.longer = oldState;
+        } else {
+            state.length = 'equal';
+        }
+        return state;
+    }
+
     private compareStates(oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[]) {
         let changes: IElementChange[] = [];
-        newState.forEach((el, i) => {
-            const oldEl = oldState[i];
-            let hasChange = false
-            let change: IElementChange = { index: i, changes: [] };
+        let state = this.compareLength(oldState, newState);
 
-            if (!!oldEl && !!el) {
-                let isEdited = false;
-                for (let x = 0; x < el.attributes.length; x++) {
-                    const newAttr = el.attributes[x];
-                    const oldAttr = oldEl.attributes[i];
-
-                    if ((!oldAttr && !!newAttr) || (!!oldAttr && !newAttr) || (oldAttr.name !== newAttr.name || oldAttr.value !== newAttr.value)) {
-                        isEdited = true;
-                        break;
-                    }
-                }
-
-                if (el.tag !== oldEl.tag || el.content !== oldEl.content) {
-                    isEdited = true;
-                }
-
-                if (isEdited) {
-                    change.changes.push({ name: 'editElement', value: el });
-                    hasChange = true;
-                }
-
-                const childrens = this.compareStates(oldEl.childrens, el.childrens);
-                if (childrens.length > 0) {
-                    change.changes.push({ name: 'loopChanges', value: childrens });
-                    hasChange = true;
-                }
-            } else if (!oldEl && !!el) {
-                change.changes.push({ name: 'addElement', value: el });
-                hasChange = true;
-            } else if (!!oldEl && !el) {
-                change.changes.push({ name: 'removeElement', value: oldEl });
-            }
-
-            if (hasChange) {
-                changes.push(change);
-            }
+        state.longer.forEach((el, i) => {
+            const revEl = state.shorter[i];
+            let change: IElementChange = { index: i, changes: this.compareTwoElements(revEl, el, state.length) };
+            if (change.changes.length > 0) { changes = [...changes, change]; }
         })
 
         return changes;
     }
 
-    private editElement(context: any, parent: ChildNode, currEl: ChildNode, newEl: IHTMLRepresentation) {
-        const el = this.createDomElement(context, newEl);
-        if(!currEl) {
-            parent.appendChild(el);
-        } else {
-            if ((currEl as HTMLElement).tagName !== (el as HTMLElement).tagName) {
-                currEl.replaceWith(el);
+    private editAttribute(context: any, currEl: ChildNode, { name, value }: { name: string, value: any }) {
+        const match = name.match(this.attr_reg);
+
+        if (match) {
+            const attr = name.slice(1);
+            if (typeof value === 'function' && events[attr]) {
+                currEl.addEventListener(attr, value.bind(context));
             } else {
-                if(currEl.textContent !== el.textContent) {
-                    currEl.textContent = el.textContent;
-                }
-    
-                let currAttrs = (currEl as HTMLElement).attributes;
-                let newAttrs = (el as HTMLElement).attributes;
-    
-                if(!currAttrs || !newAttrs) {
-                    return;
-                }
-    
-                for (let i = 0; i < newAttrs.length; i++) {
-                    const newAttr = newAttrs[i];
-                    const currAttr = currAttrs[i];
-    
-                    if(newAttr.name !== currAttr.name || newAttr.value !== currAttr.value ) {
-                        (currEl as HTMLElement).setAttribute(newAttr.name, newAttr.value);
-                    }
-                }
+                (currEl as HTMLElement).setAttribute(attr, value);
             }
+        } else {
+            (currEl as HTMLElement).setAttribute(name, value);
         }
+    }
+
+    private replacedName(currEl: ChildNode, value: string) {
+        currEl.textContent = value;
+    }
+
+    private replacedElement(context: any, currEl: ChildNode, value: IHTMLRepresentation) {
+        const e = this.createDomElement(context, value);
+        currEl.replaceWith(e);
     }
 
     private addElement(context: any, parent: ChildNode, newEl: IHTMLRepresentation) {
@@ -180,10 +233,15 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
         }
     }
 
-    private removeElement(el: ChildNode) {
-        console.log(el);
-        
-        el.remove();
+    private removeElement(currEl: ChildNode, key: { name: string, value: string }) {
+        const currKey = (currEl as HTMLElement).attributes.getNamedItem('key');
+        if (!currKey) {
+            console.error('It is requared to set key attribute!');
+        } else if (currKey.value !== key.value) {
+            throw new Error("Current element key is different from provided!"); 7
+        }
+
+        currEl.remove();
     }
 
     updateHTML(parent: ChildNode, childrens: NodeListOf<ChildNode>, map: IElementChange[], context: any) {
@@ -191,15 +249,19 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
             let currEl = childrens[index];
 
             changes.forEach((({ name, value }: any) => {
-                if (name === 'editElement') {
-                    this.editElement(context, parent, currEl, value);
+                if (name === 'editAttribute') {
+                    this.editAttribute(context, currEl, value);
+                } else if (name === 'replacedName') {
+                    this.replacedName(currEl, value);
+                } else if (name === 'replacedElement') {
+                    this.replacedElement(context, currEl, value);
                 } else if (name === 'addElement') {
                     this.addElement(context, parent, value);
                 } else if (name === 'removeElement') {
-                    this.removeElement(value);
+                    this.removeElement(currEl, value);
                 } else if (name === 'loopChanges') {
                     this.updateHTML(currEl, currEl.childNodes, value, context);
-                } 
+                }
             }))
         })
     }
@@ -232,11 +294,11 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
                 let content = this.bindedCompileTemplateString(newEl.content, context, true);
                 let c = this.createElement('div', content);
                 let arr = Array.prototype.slice.call(c.childNodes).filter(c => c.nodeName !== '#text');
-
                 if (arr.length > 0) {
                     let rep = this.createHyperscript(arr as any as NodeListOf<ChildNode>);
                     vDom = [...vDom.slice(0, i), ...rep, ...vDom.slice(i + 1)];
                     newEl = rep[0];
+
                 } else {
                     newEl.content = content;
                 }

@@ -25,7 +25,7 @@ export interface IHTMLRepresentation {
     content?: string
 }
 
-interface IChange {
+export interface IChange {
     name: string,
     value: any
 }
