@@ -55,9 +55,8 @@ export function Component({ selector, template, styles }: { selector: string, te
 
         const { constructor, ...others } = Object.getOwnPropertyDescriptors(target.prototype);
         Object.defineProperties(BasicComponent.prototype, others);
-
+        Reflect.defineMetadata('component:selector', selector, BasicComponent);
         customElements.define(selector, BasicComponent);
-        target.selector = selector;
         return BasicComponent;
     }
 }

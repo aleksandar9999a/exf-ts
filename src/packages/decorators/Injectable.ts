@@ -1,21 +1,17 @@
-const container = {};
+import { getServices } from './../modules/Module';
 
 export function Injectable({ selector }: { selector: string }) {
     return function (target: any) {
-        const isThereSomeone = Reflect.getMetadata(selector, container);
-        if (isThereSomeone) {
-            throw new Error(`Class with selector ${selector} is already injected!`);
-        }
-
-        const service = new target();
-        Reflect.defineMetadata(selector, service, container);
+        Reflect.defineMetadata('component:selector', selector, target);
         return target;
     }
 }
 
 export function Inject(selector: string) {
     return function (target: any, key: string) {
-        const service = Reflect.getMetadata(selector, container);
+        const services = getServices();
+        const service = Reflect.getMetadata(selector, services);
+        if (!service) { throw new Error(`Service ${selector} is not registered!`) }
         target[key] = service;
         return target;
     }

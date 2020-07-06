@@ -1,6 +1,24 @@
-import "reflect-metadata";
-import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
-import { bootstrap } from "./packages/bootstrap/bootstrap";
+import { ExFModule } from "./packages";
+import { RouterLink } from "./components/RouterLink";
+import { RouterOutlet } from "./components/RouterOutlet";
+import { About } from "./components/About";
+import { Contacts } from "./components/Contacts";
 import { App } from "./App";
+import { Home } from "./components/Home/Home";
+import { Test } from "./components/Test";
 
-bootstrap(App, 'app');
+
+export default ExFModule({
+    components: [
+        RouterLink,
+        RouterOutlet,
+        App,
+        About,
+        Test,
+        Contacts,
+        Home
+    ],
+    services: [],
+    modules: [],
+    bootstraps: [App]
+})
