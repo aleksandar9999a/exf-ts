@@ -1,4 +1,4 @@
-import { Component, Attribute, State } from "../../packages/decorators";
+import { Component, Attribute, State } from "../../packages";
 
 @Component({
     selector: 'exf-router-link',

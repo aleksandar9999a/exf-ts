@@ -1,6 +1,6 @@
 import template from './template.html';
-import { Component } from '../../packages/decorators/Component';
 import { IStyleItem } from '../../packages/interfaces/interfaces';
+import { Component } from '../../packages';
 
 const styles: IStyleItem[] = [
     {

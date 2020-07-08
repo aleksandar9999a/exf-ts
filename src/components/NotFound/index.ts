@@ -1,4 +1,4 @@
-import { Component } from "../../packages/decorators/Component";
+import { Component } from "../../packages";
 
 @Component({
     selector: 'exf-not-found',

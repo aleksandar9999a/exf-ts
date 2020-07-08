@@ -1,5 +1,4 @@
 <div>
-    <h3>Home</h3>
     <div>
         <exf-router-link to="/">Home</exf-router-link>
         <exf-router-link to="/about">About</exf-router-link>
@@ -11,8 +10,10 @@
         <exf-contacts routerLink="/contacts"></exf-contacts>
         <exf-not-found routerLink="*"></exf-not-found>
     </exf-router-outlet>
-    <div>
-        <exf-test></exf-test>
-        <exf-test></exf-test>
-    </div>
+
+    <p>${this.text}</p>
+    <p>${this.clock}</p>
+    <input type="text" $input="this.handleInput" $value="this.text">
+    <button $click="this.handleSubmit">Submit</button>
+    <ul>${this.list}</ul>
 </div>

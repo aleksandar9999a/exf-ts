@@ -1,4 +1,4 @@
-import { Component } from "../../packages/decorators";
+import { Component } from "../../packages";
 
 @Component({
     selector: 'exf-router-outlet',

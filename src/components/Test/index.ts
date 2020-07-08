@@ -1,4 +1,5 @@
-import { Component, State } from "../../packages";
+import { State } from "../../packages/decorators/State";
+import { Component } from "../../packages/decorators/Component";
 
 
 @Component({

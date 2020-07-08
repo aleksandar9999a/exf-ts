@@ -28,6 +28,27 @@ export interface IMainVDomArguments {
     value: IHTMLRepresentation | IChange | string
 }
 
+export interface IComapreService {
+    compareAttributes: (firstEl: IHTMLRepresentation, secondEl: IHTMLRepresentation) => IChange[],
+    compareTags: (first: IHTMLRepresentation, second: IHTMLRepresentation) => { name: string; value: IHTMLRepresentation; }[],
+    compareContent: (firstEl: IHTMLRepresentation, secondEl: IHTMLRepresentation) => { name: string; value: string | undefined; }[],
+    compareChildrens: (oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[]) => { name: string; value: IElementChange[]; }[],
+    compareTwoElements: (firstEl: IHTMLRepresentation, secondEl: IHTMLRepresentation, stateLenght: string) => IChange[],
+    compareLength: (oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[]) => { length: string; shorter: IHTMLRepresentation[]; longer: IHTMLRepresentation[]; },
+    compareStates: (oldState: IHTMLRepresentation[], newState: IHTMLRepresentation[]) => IElementChange[]
+}
+
+export interface IEditService {
+    attachContent: (el: HTMLElement | Text, type: string, content?: any) => void,
+    createElement: (type: string, content?: any) => HTMLElement | Text,
+    createDomElement: (context: any, element: IHTMLRepresentation) => ChildNode,
+    editAttribute: ({ context, element, value }: IMainVDomArguments) => void,
+    replacedName: ({ element, value }: IMainVDomArguments) => void,
+    replacedElement: ({ context, element, value }: IMainVDomArguments) => void,
+    addElement: ({ context, parent, value }: IMainVDomArguments) => void,
+    removeElement: ({ element, value }: IMainVDomArguments) => void,
+}
+
 export interface IWorkLoop {
     pushWork: (work: Function) => void;
 }

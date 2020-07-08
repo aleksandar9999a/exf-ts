@@ -1,5 +1,5 @@
-import { Injectable } from "../decorators";
 import { IWorkLoop } from "../interfaces/interfaces";
+import { Injectable } from "../decorators/Injectable";
 
 window.requestIdleCallback = window.requestIdleCallback || function (handler) {
     let startTime = Date.now();
