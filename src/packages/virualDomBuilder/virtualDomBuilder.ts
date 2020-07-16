@@ -117,6 +117,6 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
             map: changes,
             context
         })
-        return { newState, changes, commit };
+        return { newState, commit };
     }
 }

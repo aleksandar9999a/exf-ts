@@ -11,7 +11,6 @@ export function Component({ selector, template, styles }: { selector: string, te
             private workLoop: IWorkLoop;
             root: ShadowRoot;
             currRepresentation: IHTMLRepresentation[];
-            lastChanges: IElementChange[] = [];
             htmlRep: IHTMLRepresentation[];
             realDom: HTMLElement | Text;
 
@@ -44,9 +43,8 @@ export function Component({ selector, template, styles }: { selector: string, te
             update() {
                 if(!this.workLoop) { return; }
                 this.workLoop.pushWork(() => {
-                    const { newState, changes, commit } = this.vDomBuilder.update(this, this.htmlRep, this.currRepresentation);
+                    const { newState, commit } = this.vDomBuilder.update(this, this.htmlRep, this.currRepresentation);
                     this.currRepresentation = newState;
-                    this.lastChanges = changes;
                     return commit;
                 })
             }
