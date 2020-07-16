@@ -21,14 +21,13 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
     }
 
     private createHyperscript(elements: NodeListOf<ChildNode>): IHTMLRepresentation[] {
-        let rep: IHTMLRepresentation[] = [];
-        for (let i = 0; i < elements.length; i++) {
+        const arr = Array.prototype.slice.call(elements);
+        return arr.reduce((acc, currEl) => {
             let currNode: IHTMLRepresentation = { tag: '', attributes: [], childrens: [] };
-            const currEl = elements[i];
             currNode.tag = currEl.nodeName;
 
             const attrs = (currEl as any).attributes as NamedNodeMap;
-            if (currNode.tag !== "#text" && !!attrs) {
+            if (!!attrs) {
                 for (let x = 0; x < attrs.length; x++) {
                     const attr = attrs[x];
                     currNode.attributes.push({ name: attr.name, value: attr.value });
@@ -40,9 +39,8 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
             const child = this.createHyperscript(currEl.childNodes);
             currNode.childrens = child.filter(c => !((c.tag === '#comment' || c.tag === "#text") && c.content?.trim().length === 0));
 
-            rep.push(currNode);
-        }
-        return rep;
+            return [...acc.slice(), currNode];
+        }, []);
     }
 
     updateHTML({ parent, childrens, map, context }: IUpdateHTML) {
@@ -62,39 +60,43 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
 
     createTemplateRepresentation(html: string): IHTMLRepresentation[] {
         const temp = this.eService.createElement('template', html) as HTMLTemplateElement;
-        const vDom = this.createHyperscript(temp.content.childNodes);
-        return vDom;
+        return this.createHyperscript(temp.content.childNodes);
     }
 
     createRealDom(vDom: IHTMLRepresentation[], context: any): HTMLElement | Text {
         return this.eService.createDomElement(context, { tag: 'div', attributes: [], childrens: vDom }) as HTMLElement | Text;
     }
 
+    generateAttr(context: any, attr: { name: string, value: any }) {
+        let newAttr = { ...attr };
+        const match = newAttr.name.match(this.attr_reg);
+        if (match) { newAttr.value = this.bindedCompileTemplateString(newAttr.value, context); }
+        return newAttr;
+    }
+
+    generateElContent(context: any, content: any) {
+        let c = this.bindedCompileTemplateString(content, context, true);
+        let el = this.eService.createElement('div', c);
+        return {
+            raw: c,
+            childrens: Array.prototype.slice.call(el.childNodes).filter(e => e.nodeName !== '#text')
+        }
+    }
+
     createState(vDom: IHTMLRepresentation[], context: any) {
-        let state: IHTMLRepresentation[] = [];
-
-        for (let i = 0; i < vDom.length; i++) {
-            const element = vDom[i];
-            let newEl = Object.assign({}, element);
-
-            newEl.attributes = newEl.attributes.map(attr => {
-                let newAttr = Object.assign({}, attr);
-                const match = newAttr.name.match(this.attr_reg);
-                if (match) { newAttr.value = this.bindedCompileTemplateString(newAttr.value, context); }
-                return newAttr;
-            })
+        return vDom.reduce((acc: IHTMLRepresentation[], element) => {
+            let newEl = { ...element };
+            let newElements: IHTMLRepresentation[] = [];
+            newEl.attributes = newEl.attributes.map(this.generateAttr.bind(this, context));
 
             if (newEl.content) {
-                let content = this.bindedCompileTemplateString(newEl.content, context, true);
-                let c = this.eService.createElement('div', content);
-                let arr = Array.prototype.slice.call(c.childNodes).filter(c => c.nodeName !== '#text');
-                if (arr.length > 0) {
-                    let rep = this.createHyperscript(arr as any as NodeListOf<ChildNode>);
-                    vDom = [...vDom.slice(0, i), ...rep, ...vDom.slice(i + 1)];
-                    newEl = rep[0];
-
+                const c = this.generateElContent(context, newEl.content);
+                if (c.childrens.length > 0) {
+                    const newRep = this.createHyperscript(c.childrens as any as NodeListOf<ChildNode>);
+                    newEl = newRep[0];
+                    newElements = this.createState(newRep.slice(1), context);
                 } else {
-                    newEl.content = content;
+                    newEl.content = c.raw;
                 }
             }
 
@@ -102,10 +104,8 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
                 newEl.childrens = this.createState(newEl.childrens, context);
             }
 
-            state.push(newEl);
-        }
-
-        return state;
+            return [...acc.slice(), newEl, ...newElements]
+        }, []);
     }
 
     update(context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) {
