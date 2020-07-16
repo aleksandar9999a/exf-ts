@@ -1,7 +1,7 @@
 export interface IComponentDecorator {
     root: ShadowRoot;
     currRepresentation: IHTMLRepresentation[];
-    virtualDom: IHTMLRepresentation[];
+    htmlRep: IHTMLRepresentation[];
     realDom: HTMLElement | Text;
     update: () => void;
 }

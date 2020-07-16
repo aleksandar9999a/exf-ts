@@ -7,13 +7,6 @@ import { createStyles } from "./styles";
 import { addEvent, events, CompareService, VirtualDomBuilder, EditService } from "./virualDomBuilder";
 import { WorkLoop } from "./workLoop";
 
-ExFModule({
-    services: [
-        VirtualDomBuilder,
-        WorkLoop
-    ]
-})
-
 export {
     bootstrap, 
     createComponent,

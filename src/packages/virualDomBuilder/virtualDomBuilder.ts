@@ -1,12 +1,16 @@
 import { IHTMLRepresentation, IVirtualDomBuilder, IUpdateHTML, IComapreService, IEditService } from "./../interfaces/interfaces";
-import { Injectable, Inject } from "..";
+import { compareServiceFactory, editServiceFactory } from "../factories/factories";
 
 
-@Injectable({ selector: 'VirtualDomBuilder' })
 export class VirtualDomBuilder implements IVirtualDomBuilder {
-    @Inject('CompareService') private cService!: IComapreService;
-    @Inject('EditService') private eService!: IEditService;
+    private cService: IComapreService;
+    private eService: IEditService;
     private attr_reg = /\$[\w]+/g;
+
+    constructor() {
+        this.cService = compareServiceFactory();
+        this.eService = editServiceFactory();
+    }
 
     private bindedCompileTemplateString(str: string, context: any, stringify?: boolean) {
         if (stringify) {

@@ -1,8 +1,7 @@
-import { Injectable, events, ExFModule } from "..";
+import { events } from "..";
 import { IMainVDomArguments, IChange, IHTMLRepresentation, IEditService } from "../interfaces/interfaces";
 
-@Injectable({ selector: 'EditService' })
-export class EditService implements IEditService{
+export class EditService implements IEditService {
     private attr_reg = /\$[\w]+/g;
 
     attachContent(el: HTMLElement | Text, type: string, content?: any) {
@@ -83,9 +82,3 @@ export class EditService implements IEditService{
         element.remove();
     }
 }
-
-ExFModule({
-    services: [
-        EditService
-    ]
-})

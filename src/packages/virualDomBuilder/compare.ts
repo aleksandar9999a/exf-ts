@@ -1,8 +1,5 @@
 import { IHTMLRepresentation, IChange, IElementChange, IComapreService } from "../interfaces/interfaces";
-import { Injectable } from "../decorators/Injectable";
-import { ExFModule } from "..";
 
-@Injectable({ selector: 'CompareService' })
 export class CompareService implements IComapreService {
     compareAttributes(firstEl: IHTMLRepresentation, secondEl: IHTMLRepresentation) {
         const firstAttrs = firstEl.attributes;
@@ -110,9 +107,3 @@ export class CompareService implements IComapreService {
         return changes;
     }
 }
-
-ExFModule({
-    services: [
-        CompareService
-    ]
-})
