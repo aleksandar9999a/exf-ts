@@ -4,34 +4,24 @@ import { IModuleContainer, IExFModule } from '../interfaces/interfaces';
 
 const container: IModuleContainer = {
   components: {},
-  services: {},
   bootstraps: {}
 }
 
-function register(target: any, instance: boolean, cmp: any,) {
+function register(target: any, cmp: any,) {
   const selector = Reflect.getMetadata('component:selector', cmp);
-  const isThereSomeone = Reflect.getMetadata(selector, target);
-  if (isThereSomeone) { throw new Error(`Component ${selector} is already registered!`); }
-  const c = instance ? new cmp() : cmp;
-  Reflect.defineMetadata(selector, c, target);
-}
-
-function registerModules(module: IExFModule) {
-  return ExFModule(module)
+  if (target[selector]) {
+    throw new Error(`Component ${selector} is already registered!`);
+  }
+  target[selector] = cmp;
 }
 
 function registerBootstraps(cmp: any) {
-  register(container.bootstraps, false, cmp);
+  register(container.bootstraps, cmp);
   bootstrap(cmp, 'app');
 }
 
-export function ExFModule({ components, services, modules, bootstraps }: IExFModule) {
-  if (!!services) { services.forEach(register.bind(undefined, container.services, true)); }
-  if (!!components) { components.forEach(register.bind(undefined, container.components, false)); }
-  if (!!modules) { modules.forEach(registerModules); }
+export function ExFModule({ components, modules, bootstraps }: IExFModule) {
+  if (!!components) { components.forEach(register.bind(undefined, container.components)); }
+  if (!!modules) { modules.forEach(ExFModule); }
   if (!!bootstraps) { bootstraps.forEach(registerBootstraps); }
-}
-
-export function getServices() {
-  return container.services;
 }

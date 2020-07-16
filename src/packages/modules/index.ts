@@ -1,6 +1,5 @@
-import { ExFModule, getServices } from './Module';
+import { ExFModule } from './Module';
 
 export {
-    ExFModule, 
-    getServices
+    ExFModule
 }

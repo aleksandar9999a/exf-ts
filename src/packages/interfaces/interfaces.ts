@@ -97,13 +97,11 @@ export interface IStyleItem {
 
 export interface IExFModule {
     components?: any[],
-    services?: any[],
     modules?: any[],
     bootstraps?: any[]
 }
 
 export interface IModuleContainer {
     components: object,
-    services: object,
     bootstraps: object
 }

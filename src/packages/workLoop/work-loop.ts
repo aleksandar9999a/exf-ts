@@ -1,5 +1,4 @@
 import { IWorkLoop } from "../interfaces/interfaces";
-import { Injectable } from "../decorators/Injectable";
 
 window.requestIdleCallback = window.requestIdleCallback || function (handler) {
     let startTime = Date.now();
@@ -14,7 +13,6 @@ window.requestIdleCallback = window.requestIdleCallback || function (handler) {
     }, 1);
 }
 
-@Injectable({ selector: 'WorkLoop' })
 export class WorkLoop implements IWorkLoop {
     private isWorking = false;
     private queue: Function[] = [];

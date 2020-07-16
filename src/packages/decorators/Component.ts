@@ -5,7 +5,7 @@ import { vDomBuilderFactory, workLoopFactory } from '../factories/factories';
 export function Component({ selector, template, styles }: { selector: string, template: string, styles?: IStyleItem[] }): any {
     return function componentDecorator(target: any) {
         const attributes = Reflect.getMetadata('component:attributes', target.prototype) || [];
-
+        
         class BasicComponent extends HTMLElement implements IComponentDecorator {
             private vDomBuilder: IVirtualDomBuilder;
             private workLoop: IWorkLoop;

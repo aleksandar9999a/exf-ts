@@ -18,7 +18,6 @@ export default ExFModule({
         Contacts,
         Home
     ],
-    services: [],
     modules: [],
     bootstraps: [App]
 })
