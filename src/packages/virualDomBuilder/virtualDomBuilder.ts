@@ -111,6 +111,12 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
     update(context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) {
         const newState = this.createState(vDom, context);
         const changes = this.cService.compareStates(currState, newState);
-        return { newState, changes };
+        const commit = this.updateHTML.bind(this, {
+            parent: context.root.childNodes[0],
+            childrens: context.root.children[0].childNodes,
+            map: changes,
+            context
+        })
+        return { newState, changes, commit };
     }
 }

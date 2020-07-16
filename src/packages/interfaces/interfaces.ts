@@ -11,7 +11,7 @@ export interface IVirtualDomBuilder {
     createRealDom: (vDom: IHTMLRepresentation[], context: any) => HTMLElement | Text,
     createState: (vDom: IHTMLRepresentation[], context: any) => IHTMLRepresentation[],
     updateHTML: (arg: IUpdateHTML) => void,
-    update: (context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) => { newState: IHTMLRepresentation[], changes: IElementChange[] }
+    update: (context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) => { newState: IHTMLRepresentation[], changes: IElementChange[], commit: Function }
 }
 
 export interface IUpdateHTML {
