@@ -43,6 +43,22 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
         }, []);
     }
 
+    private removeComments(html: string) {
+        let htmlCopy = html.slice();
+
+        while (true) {
+            const indexOfOpenComment = htmlCopy.indexOf('<!--');
+            const indexOfCloseComment = htmlCopy.indexOf('-->');
+            if (indexOfOpenComment > -1 && indexOfCloseComment > -1) {
+                htmlCopy = htmlCopy.slice(0, indexOfOpenComment) + htmlCopy.slice(indexOfCloseComment + 3);
+            } else {
+                break;
+            }
+        }
+
+        return htmlCopy;
+    }
+
     updateHTML({ parent, childrens, map, context }: IUpdateHTML) {
         map.forEach(({ index, changes }) => {
             let element = childrens[index];
@@ -59,7 +75,8 @@ export class VirtualDomBuilder implements IVirtualDomBuilder {
     }
 
     createTemplateRepresentation(html: string): IHTMLRepresentation[] {
-        const temp = this.eService.createElement('template', html) as HTMLTemplateElement;
+        const htmlWithoutComments = this.removeComments(html);
+        const temp = this.eService.createElement('template', htmlWithoutComments) as HTMLTemplateElement;
         return this.createHyperscript(temp.content.childNodes);
     }
 
