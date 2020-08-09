@@ -1,9 +1,5 @@
-import { VirtualDomBuilder, EditService, CompareService } from "..";
+import {  EditService, CompareService } from "..";
 import { WorkLoop } from "../workLoop";
-
-export function vDomBuilderFactory() {
-    return new VirtualDomBuilder();
-}
 
 export function workLoopFactory() {
     return new WorkLoop();

@@ -1,6 +1,6 @@
 import { CompareService } from './compare';
 import { EditService } from './editService';
-import { VirtualDomBuilder } from './virtualDomBuilder';
+import {  ExF, representationParser } from './virtualDomBuilder';
 import { addEvent, events } from './events-register';
 
 export {
@@ -8,5 +8,6 @@ export {
     events,
     CompareService,
     EditService,
-    VirtualDomBuilder
+    ExF,
+    representationParser
 }

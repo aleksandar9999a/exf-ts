@@ -14,6 +14,12 @@ export interface IVirtualDomBuilder {
     update: (context: any, vDom: IHTMLRepresentation[], currState: IHTMLRepresentation[]) => { newState: IHTMLRepresentation[], commit: Function }
 }
 
+export interface IElementRepresentation {
+    tag: string,
+    props: [],
+    children: IElementRepresentation[]
+}
+
 export interface IUpdateHTML {
     parent: ChildNode,
     childrens: NodeListOf<ChildNode>,
