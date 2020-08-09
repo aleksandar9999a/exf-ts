@@ -1,7 +1,7 @@
 import { IWorkLoop, IStyleItem, IElementRepresentation } from '../interfaces/interfaces';
 import { createStyles } from '../styles/createStyles';
 import { workLoopFactory } from '../factories/factories';
-import { representationParser } from '../virualDomBuilder';
+import { representationParser, extractChanges } from '../virualDomBuilder';
 
 export function Component({ selector, styles }: { selector: string, styles?: IStyleItem[] }): any {
     return function componentDecorator(target: any) {
@@ -11,6 +11,7 @@ export function Component({ selector, styles }: { selector: string, styles?: ISt
             private workLoop: IWorkLoop;
             root: ShadowRoot;
             representation: IElementRepresentation;
+            html: HTMLElement;
             render: any;
 
             static get observedAttributes() {
@@ -27,21 +28,26 @@ export function Component({ selector, styles }: { selector: string, styles?: ISt
                 this.root = this.attachShadow({ mode: 'closed' });
                 this.workLoop = workLoopFactory();
                 this.representation = this.render();
-                this.root.appendChild(representationParser(this.representation));
+                this.html = representationParser(this.representation);
+                this.root.appendChild(this.html);
                 if (styles) {
                     const s = createStyles(styles);
                     (this.root as any).adoptedStyleSheets = [s];
                 }
             }
 
-            // update() {
-            //     if (!this.workLoop) { return; }
-            //     this.workLoop.pushWork(() => {
-            //         const { newState, commit } = this.vDomBuilder.update(this, this.htmlRep, this.currRepresentation);
-            //         this.currRepresentation = newState;
-            //         return commit;
-            //     })
-            // }
+            update() {
+                if (!this.workLoop) { 
+                    return; 
+                }
+                
+                this.workLoop.pushWork(() => {
+                    const newRep = this.render();
+                    const commit = extractChanges(this, this.representation, newRep);
+                    this.representation = newRep;
+                    return commit;
+                })
+            }
         }
 
         const { constructor, ...others } = Object.getOwnPropertyDescriptors(target.prototype);

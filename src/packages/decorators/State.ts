@@ -3,7 +3,9 @@ export function State(target: any, key: string, descriptor?: TypedPropertyDescri
         const currentMethod = descriptor.value;
         descriptor.value = function (this: any, ...args: any[]) {
             currentMethod(...args);
-            if (this.update) { this.update(); }
+            if (this.update) {
+                this.update();
+            }
         }
         return;
     }
@@ -13,7 +15,10 @@ export function State(target: any, key: string, descriptor?: TypedPropertyDescri
     Object.defineProperty(target, key, {
         set(newValue) {
             val = newValue;
-            if (this.update) { this.update(); }
+            
+            if (this.update) {
+                this.update();
+            }
         },
         get() {
             return val;

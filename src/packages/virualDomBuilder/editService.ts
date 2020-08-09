@@ -1,8 +1,8 @@
 import { events } from "..";
 import { IMainVDomArguments, IChange, IHTMLRepresentation, IEditService } from "../interfaces/interfaces";
 
-export class EditService implements IEditService {
-    private attr_reg = /\$[\w]+/g;
+export const editService = {
+    attr_reg: /\$[\w]+/g,
 
     attachContent(el: HTMLElement | Text, type: string, content?: any) {
         if (typeof content === "string") {
@@ -15,11 +15,12 @@ export class EditService implements IEditService {
         if (typeof content === "object") {
             el.appendChild(content);
         }
-    }
+    },
 
     createElement(type: string, content?: any): HTMLElement | Text {
         let e: HTMLElement | Text;
         let t = 'element';
+
         if (type.includes("#")) {
             e = document.createTextNode(content);
             t = 'text';
@@ -28,7 +29,7 @@ export class EditService implements IEditService {
         }
         this.attachContent(e, t, content);
         return e;
-    }
+    },
 
     createDomElement(context: any, element: IHTMLRepresentation) {
         const { tag, attributes, childrens, content } = element;
@@ -36,7 +37,7 @@ export class EditService implements IEditService {
         attributes.forEach(value => this.editAttribute({ context, element: el, value }));
         childrens.map(this.createDomElement.bind(this, context)).forEach(child => el.appendChild(child));
         return el;
-    }
+    },
 
     editAttribute({ context, element, value }: IMainVDomArguments) {
         const match = (value as IChange).name.match(this.attr_reg);
@@ -51,16 +52,19 @@ export class EditService implements IEditService {
         } else {
             (element as HTMLElement).setAttribute((value as IChange).name, (value as IChange).value);
         }
-    }
+    },
 
     replacedName({ element, value }: IMainVDomArguments) {
         element.textContent = value as string;
-    }
+    },
 
     replacedElement({ context, element, value }: IMainVDomArguments) {
-        const e = this.createDomElement(context, value as IHTMLRepresentation);
-        element.replaceWith(e);
-    }
+        const el = typeof value === 'string'
+            ? document.createTextNode(value)
+            : this.createDomElement(context, value as IHTMLRepresentation);
+
+        element.replaceWith(el);
+    },
 
     addElement({ context, parent, value }: IMainVDomArguments) {
         const el = this.createDomElement(context, value as IHTMLRepresentation);
@@ -69,7 +73,7 @@ export class EditService implements IEditService {
         } else {
             parent!.appendChild(el);
         }
-    }
+    },
 
     removeElement({ element, value }: IMainVDomArguments) {
         const currKey = (element as HTMLElement).attributes.getNamedItem('key');
@@ -80,5 +84,5 @@ export class EditService implements IEditService {
         }
 
         element.remove();
-    }
+    },
 }
