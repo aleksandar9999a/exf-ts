@@ -1,12 +1,12 @@
 import { IWorkLoop } from "../interfaces/interfaces";
 
 window.requestIdleCallback = window.requestIdleCallback || function (handler) {
-    let startTime = Date.now();
+    const startTime = Date.now();
 
-    return setTimeout(function () {
+    return setTimeout(() => {
         handler({
             didTimeout: false,
-            timeRemaining: function () {
+            timeRemaining: () => {
                 return Math.max(0, 50.0 - (Date.now() - startTime));
             }
         });
@@ -20,7 +20,11 @@ export class WorkLoop implements IWorkLoop {
 
     pushWork(work: Function) {
         this.queue = this.queue.concat(work);
-        if (this.isWorking) { return; }
+
+        if (this.isWorking) { 
+            return; 
+        }
+
         this.isWorking = true;
         this.processWork();
     }
@@ -34,8 +38,13 @@ export class WorkLoop implements IWorkLoop {
                 this.queue = this.queue.slice(1);
             }
 
-            if (this.queue.length > 0) { this.processWork(); }
-            if (this.result.length > 0) { this.commitWork(); }
+            if (this.queue.length > 0) { 
+                this.processWork();
+            }
+
+            if (this.result.length > 0) { 
+                this.commitWork(); 
+            }
         })
     }
 
