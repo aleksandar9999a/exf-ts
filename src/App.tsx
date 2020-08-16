@@ -6,31 +6,52 @@ import { ExF, Component, State } from './packages';
 })
 export class App {
     @State
+    className = '1';
+    
+    @State
     name = 'alex';
 
     @State
-    list: string[] = [];
+    list: string[] = ['i','i','i'];
 
     handleClick = (e: any) => {
         this.list = [...this.list, 'ivaneeee'];
+    }
+
+    handleRemove = (e: any) => {
+        this.list = this.list.slice(0, this.list.length - 1)
+    }
+
+    handleClassName = (e: any) => {
+        this.className = '2'
     }
 
     handleInput = (e: any) => {
         this.name = e.target.value;
     }
 
+    log() {
+        console.log('work')
+    }
+
     render() {
-        return <div id="ivan" className="pesho">
-            <div>
-                <button onClick={this.handleClick}>Add Item</button>
+        return (
+            <div id="ivan" className={this.className}>
+                <div>
+                    <button onClick={this.handleClick}>Add Item</button>
+                    <button onClick={this.handleRemove}>Remove Item</button>
+                    <button onClick={this.handleClassName}>Change className</button>
+                </div>
+                <input onInput={this.handleInput} />
+                <div>
+                    <p className={this.className}>{this.name}</p>
+                </div>
+                <div>
+                    {this.list.map(item => {
+                        return <p>{item}</p>
+                    })}
+                </div>
             </div>
-            <input onInput={this.handleInput} />
-            <div>
-                <p>{this.name}</p>
-            </div>
-            <div>
-                {this.list}
-            </div>
-        </div>
+        )
     }
 }
