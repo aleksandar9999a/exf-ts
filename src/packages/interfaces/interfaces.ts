@@ -16,7 +16,7 @@ export interface IVirtualDomBuilder {
 
 export interface IElementRepresentation {
     tag: string,
-    props: [],
+    props: Object,
     children: IElementRepresentation[]
 }
 
