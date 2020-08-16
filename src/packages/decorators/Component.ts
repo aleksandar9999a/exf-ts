@@ -3,7 +3,7 @@ import { createStyles } from '../styles/createStyles';
 import { workLoopFactory } from '../factories/factories';
 import { representationParser, extractChanges } from '../virualDomBuilder';
 
-export function Component({ selector, styles }: { selector: string, styles?: IStyleItem[] }): any {
+export function Component({ selector }: { selector: string }): any {
     return function componentDecorator(target: any) {
         const attributes = Reflect.getMetadata('component:attributes', target.prototype) || [];
 
@@ -20,6 +20,7 @@ export function Component({ selector, styles }: { selector: string, styles?: ISt
 
             attributeChangedCallback(name: any, oldValue: any, newValue: any) {
                 (this as any)[name] = newValue;
+                this.update();
             }
 
             constructor() {
@@ -30,10 +31,6 @@ export function Component({ selector, styles }: { selector: string, styles?: ISt
                 this.representation = this.render();
                 this.html = representationParser(this.representation);
                 this.root.appendChild(this.html);
-                if (styles) {
-                    const s = createStyles(styles);
-                    (this.root as any).adoptedStyleSheets = [s];
-                }
             }
 
             update() {

@@ -5,6 +5,8 @@ import { ExF, Component, State } from './packages';
     selector: 'exf-app'
 })
 export class App {
+    green = 'green';
+
     @State
     className = '1';
     
@@ -37,7 +39,7 @@ export class App {
     render() {
         return (
             <div id="ivan" className={this.className}>
-                <div>
+                <div style={{ backgroundColor: 'black' }}>
                     <button onClick={this.handleClick}>Add Item</button>
                     <button onClick={this.handleRemove}>Remove Item</button>
                     <button onClick={this.handleClassName}>Change className</button>

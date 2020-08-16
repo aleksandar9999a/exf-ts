@@ -30,6 +30,12 @@ export function representationParser({ tag, props, children }: IElementRepresent
     Object.keys(props || {}).forEach((key: any) => {
         if (typeof (props as any)[key] === 'function' && !!events[key]) {
             el.addEventListener(events[key], (props as any)[key]);
+        } else if(key === 'style') {
+            const styleProps = Object.keys((props as any)[key]);
+            
+            styleProps.forEach(style => {
+                (el as any).style[style] = (props as any)[key][style];
+            })
         } else {
             (el as any)[key] = (props as any)[key];
         }
