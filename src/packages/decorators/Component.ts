@@ -20,7 +20,6 @@ export function Component({ selector }: { selector: string }): any {
 
             attributeChangedCallback(name: any, oldValue: any, newValue: any) {
                 (this as any)[name] = newValue;
-                this.update();
             }
 
             constructor() {
