@@ -4,7 +4,6 @@ import { representationParser, extractChanges } from '../virualDomBuilder';
 
 export function Component({ selector }: { selector: string }): any {
     return function componentDecorator(target: any) {
-        const attributes = Reflect.getMetadata('component:attributes', target.prototype) || [];
 
         class BasicComponent extends HTMLElement {
             private workLoop: IWorkLoop;
@@ -12,14 +11,6 @@ export function Component({ selector }: { selector: string }): any {
             representation: IElementRepresentation;
             html: HTMLElement;
             render: any;
-
-            static get observedAttributes() {
-                return attributes;
-            }
-
-            attributeChangedCallback(name: any, oldValue: any, newValue: any) {
-                this.update();
-            }
 
             constructor() {
                 super();
@@ -48,6 +39,7 @@ export function Component({ selector }: { selector: string }): any {
         const { constructor, ...others } = Object.getOwnPropertyDescriptors(target.prototype);
         Object.defineProperties(BasicComponent.prototype, others);
         Reflect.defineMetadata('component:selector', selector, BasicComponent);
+        
         customElements.define(selector, BasicComponent);
         return BasicComponent;
     }

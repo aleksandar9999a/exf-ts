@@ -1,4 +1,4 @@
-import ExF, { Component, State } from './packages';
+import ExF, { Component, State, Attribute } from './packages';
 
 
 @Component({
@@ -6,6 +6,9 @@ import ExF, { Component, State } from './packages';
 })
 export class App {
     green = 'green';
+
+    @Attribute
+    dir: any;
 
     @State
     className = '1';
@@ -39,7 +42,8 @@ export class App {
     render() {
         return (
             <div id="ivan" className={this.className}>
-                <div style={{ backgroundColor: 'black' }}>
+                <p>{this.dir}</p>
+                {/* <div style={{ backgroundColor: 'black' }}>
                     <button onClick={this.handleClick}>Add Item</button>
                     <button onClick={this.handleRemove}>Remove Item</button>
                     <button onClick={this.handleClassName}>Change className</button>
@@ -52,7 +56,7 @@ export class App {
                     {this.list.map(item => {
                         return <p>{item}</p>
                     })}
-                </div>
+                </div> */}
             </div>
         )
     }

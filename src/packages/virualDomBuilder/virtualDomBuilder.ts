@@ -10,9 +10,11 @@ import { events } from './events-register';
  */
 function childrenParser(children: IElementRepresentation[] = []) {
     return children.map((child: IElementRepresentation | string) => {
+        
         if (typeof child === 'string') {
             return document.createTextNode(child);
         }
+        
         return representationParser(child);
     })
 }
@@ -26,7 +28,7 @@ function childrenParser(children: IElementRepresentation[] = []) {
  */
 export function representationParser({ tag, props, children }: IElementRepresentation) {
     const el = document.createElement(tag);
-
+    
     Object.keys(props || {}).forEach(key => {
         if (typeof (props as any)[key] === 'function' && !!events[key]) {
             el.addEventListener(events[key], (props as any)[key]);
@@ -99,8 +101,11 @@ function updateHTML({ parent, childrens, changes }: any) {
 
         if(!! change.children && ! currEl) {
             change.children.forEach((el: any) => {
-                const newElement = representationParser(el);
-                parent.appendChild(newElement);
+                const newEl = typeof el === 'string'
+                    ? document.createTextNode(el)
+                    : representationParser(el)
+
+                parent.appendChild(newEl);
             })
         }
     })
