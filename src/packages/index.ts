@@ -1,23 +1,24 @@
 import "reflect-metadata";
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
-import { bootstrap, createComponent } from "./bootstrap";
 import { Component, Attribute, State } from "./decorators";
-import { ExFModule } from "./modules";
-import { createStyles } from "./styles";
-import { addEvent, events, CompareService, ExF } from "./virualDomBuilder";
-import { WorkLoop } from "./workLoop";
+import { IElementRepresentation } from "./interfaces/interfaces";
 
 export {
-    bootstrap,
-    createComponent,
     Component,
     Attribute,
     State,
-    ExFModule,
-    createStyles,
-    addEvent,
-    events,
-    CompareService,
-    WorkLoop,
-    ExF
+}
+
+/**
+ * ExF - Default JSX Engine
+ * 
+ * @param {String} tag 
+ * @param {Any} props 
+ * @param {Array} children 
+ * 
+ * @returns {Object}
+ */
+export default function ExF(tag: string | Function, props: any, ...children: (string | IElementRepresentation)[]) {
+    children = (children as any).flat() as (string | IElementRepresentation)[];
+    return { tag, props: props || {}, children };
 }

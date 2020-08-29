@@ -1,5 +1,4 @@
-import { IWorkLoop, IStyleItem, IElementRepresentation } from '../interfaces/interfaces';
-import { createStyles } from '../styles/createStyles';
+import { IWorkLoop, IElementRepresentation } from '../interfaces/interfaces';
 import { workLoopFactory } from '../factories/factories';
 import { representationParser, extractChanges } from '../virualDomBuilder';
 
@@ -19,7 +18,7 @@ export function Component({ selector }: { selector: string }): any {
             }
 
             attributeChangedCallback(name: any, oldValue: any, newValue: any) {
-                (this as any)[name] = newValue;
+                this.update();
             }
 
             constructor() {

@@ -1,4 +1,4 @@
-import { ExF, Component, State } from './packages';
+import ExF, { Component, State } from './packages';
 
 
 @Component({

@@ -1,10 +1,10 @@
-import { IElementRepresentation, IChange, IUpdateHTML } from "./../interfaces/interfaces";
+import { IElementRepresentation } from "./../interfaces/interfaces";
 import { events } from './events-register';
 
 /**
  * Parse childs to html elements
  * 
- * @param {Array} children 
+ * @param {IElementRepresentation[]} children 
  * 
  * @returns {HTMLElement | Text}
  */
@@ -20,14 +20,14 @@ function childrenParser(children: IElementRepresentation[] = []) {
 /**
  * Parse HTML Representation
  * 
- * @param {Object} representation 
+ * @param {IElementRepresentation} representation 
  * 
  * @returns {HTMLElement}
  */
 export function representationParser({ tag, props, children }: IElementRepresentation) {
     const el = document.createElement(tag);
 
-    Object.keys(props || {}).forEach((key: any) => {
+    Object.keys(props || {}).forEach(key => {
         if (typeof (props as any)[key] === 'function' && !!events[key]) {
             el.addEventListener(events[key], (props as any)[key]);
         } else if(key === 'style') {
@@ -49,33 +49,18 @@ export function representationParser({ tag, props, children }: IElementRepresent
 }
 
 /**
- * ExF - Default JSX Engine
- * 
- * @param {String} tag 
- * @param {Any} props 
- * @param {Array} children 
- * 
- * @returns {Object}
- */
-export function ExF(tag: string | Function, props: any, ...children: (string | IElementRepresentation)[]) {
-    children = (children as any).flat() as (string | IElementRepresentation)[];
-    return { tag, props: props || {}, children };
-}
-
-/**
  * Extract changes and return commit function
  * 
- * @param {Object} firstRep 
- * @param {Object} secondRep 
+ * @param {IElementRepresentation} firstRep 
+ * @param {IElementRepresentation} secondRep 
  * 
- * @returns {Function}
+ * @returns {() => updateHTML()}
  */
 export function extractChanges(context: any, firstRep: IElementRepresentation, secondRep: IElementRepresentation) {
     return () => updateHTML({
         parent: context.root.childNodes[0],
         childrens: context.root.childNodes,
-        changes: compareRepresentations([firstRep], [secondRep]),
-        context
+        changes: compareRepresentations([firstRep], [secondRep])
     });
 }
 
@@ -86,7 +71,7 @@ export function extractChanges(context: any, firstRep: IElementRepresentation, s
  * 
  * @returns {Void}
  */
-function updateHTML({ parent, childrens, changes, context }: any) {
+function updateHTML({ parent, childrens, changes }: any) {
     changes.forEach((change: any) => {
         const currEl = childrens[change.elementIndex];
 
@@ -108,8 +93,7 @@ function updateHTML({ parent, childrens, changes, context }: any) {
             updateHTML({ 
                 parent: currEl,
                 childrens: currEl.childNodes,
-                changes: change.children,
-                context
+                changes: change.children
             })
         }
 
@@ -125,12 +109,12 @@ function updateHTML({ parent, childrens, changes, context }: any) {
 /**
  * Compare Representation 
  * 
- * @param {Array} oldState 
- * @param {Array} newState 
+ * @param {IElementRepresentation[]} oldState 
+ * @param {IElementRepresentation[]} newState 
  * 
  * @returns {Array}
  */
-function compareRepresentations(oldState: IElementRepresentation[], newState: IElementRepresentation[]): any {
+function compareRepresentations(oldState: IElementRepresentation[], newState: IElementRepresentation[]) {
     let changes: any = [];
 
     oldState.forEach((oldEl, i) => {
