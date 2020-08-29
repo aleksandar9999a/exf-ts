@@ -1,22 +1,18 @@
-import { IElementRepresentation } from "./../interfaces/interfaces";
+import { IElementRepresentation, IUpdateHTML } from "./../interfaces/interfaces";
 import { events } from './events-register';
 
+
 /**
- * Parse childs to html elements
+ * Parse IElementRepresentation | string to HTML Element
  * 
- * @param {IElementRepresentation[]} children 
+ * @param {IElementRepresentation | string} children 
  * 
  * @returns {HTMLElement | Text}
  */
-function childrenParser(children: IElementRepresentation[] = []) {
-    return children.map((child: IElementRepresentation | string) => {
-        
-        if (typeof child === 'string') {
-            return document.createTextNode(child);
-        }
-        
-        return representationParser(child);
-    })
+function elementParser(child: IElementRepresentation | string) {
+    return typeof child === 'string'
+        ? document.createTextNode(child)
+        : representationParser(child);
 }
 
 /**
@@ -43,7 +39,7 @@ export function representationParser({ tag, props, children }: IElementRepresent
         }
     })
 
-    childrenParser(children).forEach((child: any) => {
+    children.map(elementParser).forEach((child: any) => {
         el.appendChild(child);
     });
 
@@ -58,10 +54,10 @@ export function representationParser({ tag, props, children }: IElementRepresent
  * 
  * @returns {() => updateHTML()}
  */
-export function extractChanges(context: any, firstRep: IElementRepresentation, secondRep: IElementRepresentation) {
+export function extractChanges(childNodes: NodeListOf<ChildNode>, firstRep: IElementRepresentation, secondRep: IElementRepresentation) {
     return () => updateHTML({
-        parent: context.root.childNodes[0],
-        childrens: context.root.childNodes,
+        parent: childNodes[0],
+        childrens: childNodes,
         changes: compareRepresentations([firstRep], [secondRep])
     });
 }
@@ -69,18 +65,17 @@ export function extractChanges(context: any, firstRep: IElementRepresentation, s
 /**
  * Commit changes to ui
  * 
- * @param {Object} data
+ * @param {IUpdateHTML} data
  * 
  * @returns {Void}
  */
-function updateHTML({ parent, childrens, changes }: any) {
+function updateHTML({ parent, childrens, changes }: IUpdateHTML) {
     changes.forEach((change: any) => {
         const currEl = childrens[change.elementIndex];
-
         const propKeys = Object.keys(change.props || {});
 
         propKeys.forEach((key: any) => {
-            currEl[key] = change.props[key];
+            (currEl as any)[key] = change.props[key];
         })
 
         if(!! change.removeElement) {
@@ -101,11 +96,7 @@ function updateHTML({ parent, childrens, changes }: any) {
 
         if(!! change.children && ! currEl) {
             change.children.forEach((el: any) => {
-                const newEl = typeof el === 'string'
-                    ? document.createTextNode(el)
-                    : representationParser(el)
-
-                parent.appendChild(newEl);
+                parent.appendChild(elementParser(el));
             })
         }
     })

@@ -43,7 +43,7 @@ export class App {
         return (
             <div id="ivan" className={this.className}>
                 <p>{this.dir}</p>
-                {/* <div style={{ backgroundColor: 'black' }}>
+                <div style={{ backgroundColor: 'black' }}>
                     <button onClick={this.handleClick}>Add Item</button>
                     <button onClick={this.handleRemove}>Remove Item</button>
                     <button onClick={this.handleClassName}>Change className</button>
@@ -56,7 +56,7 @@ export class App {
                     {this.list.map(item => {
                         return <p>{item}</p>
                     })}
-                </div> */}
+                </div>
             </div>
         )
     }

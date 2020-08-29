@@ -29,7 +29,7 @@ export function Component({ selector }: { selector: string }): any {
                 
                 this.workLoop.pushWork(() => {
                     const newRep = this.render();
-                    const commit = extractChanges(this, this.representation, newRep);
+                    const commit = extractChanges(this.root.childNodes, this.representation, newRep);
                     this.representation = newRep;
                     return commit;
                 })
