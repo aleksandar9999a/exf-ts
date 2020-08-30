@@ -1,14 +1,15 @@
 import { App } from './App'
+import Rocket  from './components/Rocket';
+import { ExFModule } from './packages';
 
-const app = new App();
 
-let i = 0
-app.dir = i;
-
-setInterval(() => {
-    ++i;
-    app.dir = i;
-    console.log(app.dir)
-}, 1000)
-
-document.getElementById('app')?.appendChild(app as any as HTMLElement)
+ExFModule({
+	components: [
+		App,
+		Rocket
+	],
+	bootstraps: [
+		App
+	],
+	root: 'app'
+})
