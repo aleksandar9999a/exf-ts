@@ -14,6 +14,13 @@ export interface IWorkLoop {
     pushWork: (work: Function) => void;
 }
 
+export interface IExFModule {  
+    components?: any[],  
+    modules?: IExFModule[],  
+    bootstraps?: any[],
+    root: string
+}
+
 type RequestIdleCallbackHandle = any;
 
 type RequestIdleCallbackOptions = {
@@ -33,4 +40,12 @@ declare global {
         ) => RequestIdleCallbackHandle);
         cancelIdleCallback: ((handle: RequestIdleCallbackHandle) => void);
     }
+}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+       [elemName: string]: any;
+    }
+  }
 }
