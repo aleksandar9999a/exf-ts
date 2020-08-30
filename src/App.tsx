@@ -1,4 +1,4 @@
-import ExF, { Component, State, Ref } from './packages';
+import ExF, { Component, State, Ref, Watch } from './packages';
 
 @Component({
 	selector: 'exf-app'
@@ -9,6 +9,11 @@ export class App {
 	@Ref({ id: 'pesho' })
 	ref!: HTMLElement;
 
+	@Watch('list')
+	handler() {
+		console.log('work');
+	}
+
 	@State
 	className = '1';
 	
@@ -18,11 +23,12 @@ export class App {
 	@State
 	list: string[] = ['i','i','i'];
 
+
 	connectedCallback() {
-		console.log(this.ref)
+		// console.log(this.ref)
 	}
 
-	handleClick = (e: any) => {
+	handleClick(e: any) {
 		this.list = [...this.list, 'ivaneeee'];
 	}
 
@@ -57,7 +63,7 @@ export class App {
 				<exf-rocket items={this.list} />
 
 				<div style={{ backgroundColor: 'black' }}>
-					<button onClick={this.handleClick}>Add Item</button>
+					<button onClick={this.handleClick.bind(this)}>Add Item</button>
 
 					<button onClick={this.handleRemove}>Remove Item</button>
 
