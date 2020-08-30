@@ -4,7 +4,7 @@ import { representationParser, extractChanges } from '../virualDomBuilder';
 
 export function Component({ selector }: { selector: string }): any {
 	return function componentDecorator(target: any) {
-		class BasicComponent extends HTMLElement {
+		class Ctor extends HTMLElement {
 			root: ShadowRoot;
 			representation: IElementRepresentation;
 			html: HTMLElement;
@@ -30,10 +30,10 @@ export function Component({ selector }: { selector: string }): any {
 		}
 
 		const { constructor, ...others } = Object.getOwnPropertyDescriptors(target.prototype);
-		Object.defineProperties(BasicComponent.prototype, others);
-		Reflect.defineMetadata('component:selector', selector, BasicComponent);
+		Object.defineProperties(Ctor.prototype, others);
+		Reflect.defineMetadata('component:selector', selector, Ctor);
 		
-		customElements.define(selector, BasicComponent);
-		return BasicComponent;
+		customElements.define(selector, Ctor);
+		return Ctor;
 	}
 }
