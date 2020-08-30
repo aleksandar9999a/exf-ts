@@ -1,10 +1,13 @@
-import ExF, { Component, State } from './packages';
+import ExF, { Component, State, Ref } from './packages';
 
 @Component({
 	selector: 'exf-app'
 })
 export class App {
 	green = 'green';
+
+	@Ref({ id: 'pesho' })
+	ref!: HTMLElement;
 
 	@State
 	className = '1';
@@ -14,6 +17,10 @@ export class App {
 
 	@State
 	list: string[] = ['i','i','i'];
+
+	connectedCallback() {
+		console.log(this.ref)
+	}
 
 	handleClick = (e: any) => {
 		this.list = [...this.list, 'ivaneeee'];
@@ -47,7 +54,6 @@ export class App {
 	render() {
 		return (
 			<div id="ivan" className={this.className}>
-
 				<exf-rocket items={this.list} />
 
 				<div style={{ backgroundColor: 'black' }}>
@@ -62,15 +68,15 @@ export class App {
 
 				<input value={this.name} onInput={this.handleInput} />
 
-				<div>
+				<div id="pesho">
 					<p className={this.className}>{this.name}</p>
 				</div>
 				
-				<div>
+				<ul>
 					{this.list.map(item => {
-						return <p>{item}</p>
+						return <li>{item}</li>
 					})}
-				</div>
+				</ul>
 			</div>
 		)
 	}
