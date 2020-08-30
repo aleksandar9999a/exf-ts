@@ -26,6 +26,19 @@ function findStateProp(target: any, key: string) {
 }
 
 /**
+ * Find prop if it is registered like style
+ * 
+ * @param {Any} target
+ * @param {String} key
+ *
+ * @returns {Bool}
+ */
+function findStyleProp(target: any, key: string) {
+	const style = Reflect.getMetadata('component:style', target) || [];
+	return style.includes(key);
+}
+
+/**
  * Watch Decorator
  * 
  * @param  {String} key
@@ -47,6 +60,10 @@ export function Watch(key: string ): any {
 				if(findStateProp(target, key)) {
 					this.update();
 				}
+
+				if(findStyleProp(target, key)) {
+					this.updateStyle();
+				}
 			}
 			return;
 		}
@@ -62,6 +79,10 @@ export function Watch(key: string ): any {
 
 				if(findStateProp(target, key)) {
 					this.update();
+				}
+
+				if(findStyleProp(target, key)) {
+					this.updateStyle();
 				}
 			},
 			get() {

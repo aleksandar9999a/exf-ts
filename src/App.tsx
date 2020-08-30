@@ -1,4 +1,4 @@
-import ExF, { Component, State, Ref, Watch } from './packages';
+import ExF, { Component, State, Ref, Watch, Style } from './packages';
 
 @Component({
 	selector: 'exf-app'
@@ -10,8 +10,13 @@ export class App {
 	ref!: HTMLElement;
 
 	@Watch('list')
-	handler() {
-		console.log('work');
+	handler(newValue: any, oldValue: any) {
+
+	}
+
+	@Style
+	customStyle = {
+		'background-color': 'red'
 	}
 
 	@State
@@ -23,10 +28,6 @@ export class App {
 	@State
 	list: string[] = ['i','i','i'];
 
-
-	connectedCallback() {
-		// console.log(this.ref)
-	}
 
 	handleClick(e: any) {
 		this.list = [...this.list, 'ivaneeee'];
@@ -53,8 +54,24 @@ export class App {
 		console.log('rocket')
 	}
 
+	handleStyle = () => {
+		this.customStyle = {
+			['background-color']: 'black' 
+		};
+	}
+
 	log() {
 		console.log('work');
+	}
+
+	stylize() {
+		return (
+			<style>
+				.list {
+					this.customStyle
+				}
+			</style>
+		)
 	}
 
 	render() {
@@ -70,6 +87,8 @@ export class App {
 					<button onClick={this.handleClassName}>Change className</button>
 
 					<button onClick={this.handleSubmit}>Submit</button>
+
+					<button onClick={this.handleStyle}>Style</button>
 				</div>
 
 				<input value={this.name} onInput={this.handleInput} />
@@ -78,7 +97,7 @@ export class App {
 					<p className={this.className}>{this.name}</p>
 				</div>
 				
-				<ul>
+				<ul className="list">
 					{this.list.map(item => {
 						return <li>{item}</li>
 					})}

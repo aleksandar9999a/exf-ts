@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
-import { Component, Props, State, Ref, Watch } from "./decorators";
+import { Component, Props, State, Ref, Watch, Style } from "./decorators";
 import { IElementRepresentation } from "./interfaces/interfaces";
 import { ExFModule } from "./modules/modules";
 
@@ -10,6 +10,7 @@ export {
     State,
     Ref,
     Watch,
+    Style,
     ExFModule
 }
 
