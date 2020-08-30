@@ -20,7 +20,6 @@ export function Component({ selector }: { selector: string }): any {
 			stylize!: Function;
 			props: Props = {};
 
-
 			constructor() {
 				super();
 				target.call(this);
@@ -64,6 +63,10 @@ export function Component({ selector }: { selector: string }): any {
 			setProps(key: string, value: any) {
 				this.props[key] = value;
 				this.update();
+
+				if(this.stylize) {
+					this.updateStyle();
+				}
 			}
 
 			getProps(key: string) {

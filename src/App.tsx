@@ -4,77 +4,123 @@ import ExF, { Component, State, Ref, Watch, Style } from './packages';
 	selector: 'exf-app'
 })
 export class App {
-	green = 'green';
+	@State
+	_stars = Array(3).fill({ 'background-position-x': 0, 'background-position-y': 0 })
 
-	@Ref({ id: 'pesho' })
-	ref!: HTMLElement;
+	asteroid!: HTMLElement;
+	spaceship!: any;
 
-	@Watch('list')
-	handler(newValue: any, oldValue: any) {
+	_step = 20;
 
-	}
+	_actions: { [key: string]: Function } = {
+		ArrowUp: () => {
+			this._stars = this._stars.map((star, i) => {
+				return { 
+					...star, 
+					'background-position-y': star['background-position-y'] + i + 1
+				}
+			})
+			this._spaceshipParams = { 
+				...this._spaceshipParams, 
+				top: this._spaceshipParams.top - this._step,
+				direction: 'up'
+			}
+		},
+		ArrowDown: () => {
+			this._stars = this._stars.map((star, i) => {
+				return { 
+					...star, 
+					'background-position-y': star['background-position-y'] - i + 1
+				}
+			})
 
-	@Style
-	customStyle = {
-		'background-color': 'red'
+			this._spaceshipParams = { 
+				...this._spaceshipParams, 
+				top: this._spaceshipParams.top + this._step,
+				direction: 'down'
+			}
+		},
+		ArrowLeft: () => {
+			this._stars = this._stars.map((star, i) => {
+				return { 
+					...star, 
+					'background-position-x': star['background-position-x'] + i + 1
+				}
+			})
+			this._spaceshipParams = { 
+				...this._spaceshipParams, 
+				left: this._spaceshipParams.left - this._step,
+				direction: 'left' 
+			}
+		},
+		ArrowRight: () => {
+			this._stars = this._stars.map((star, i) => {
+				return { 
+					...star, 
+					'background-position-x': star['background-position-x'] - i + 1
+				}
+			})
+			this._spaceshipParams = {
+				...this._spaceshipParams, 
+				left: this._spaceshipParams.left + this._step,
+				direction: 'right' 
+			}
+		},
 	}
 
 	@State
-	className = 'wrapper';
-	
-	@State
-	name = 'alex';
-
-	@State
-	list: string[] = ['i','i','i'];
-
-
-	handleClick(e: any) {
-		this.list = [...this.list, 'ivaneeee'];
+	_spaceshipParams = {
+		top: 0,
+		left: 0,
+		engine: false,
+		direction: 'right'
 	}
 
-	handleRemove = (e: any) => {
-		this.list = this.list.slice(0, this.list.length - 1)
+	connectedCallback() {
+		document.addEventListener('keydown', this.handleKeyPress.bind(this))
 	}
 
-	handleClassName = (e: any) => {
-		this.className = 'container';
+	handleKeyPress(e: any) {
+		if(typeof this._actions[e.code] === 'function') {
+			this.animate(this._actions[e.code]);
+		}
 	}
 
-	handleInput = (e: any) => {
-		this.name = e.target.value;
+	detectCollision() {
+		return false;
 	}
 
-	handleSubmit = () => {
-		this.list = [...this.list, this.name];
-		this.name = '';
-	}
+	animate(action: Function) {
+		if (this.detectCollision()) {
+			this._spaceshipParams = { ...this._spaceshipParams, engine: false };
+			return;
+		}
 
-	handleRocket = () => {
-		console.log('rocket')
-	}
+		this._spaceshipParams = { ...this._spaceshipParams, engine: true };
 
-	handleStyle = () => {
-		this.customStyle = {
-			['background-color']: 'black' 
-		};
-	}
-
-	log() {
-		console.log('work');
+		action();
 	}
 
 	stylize() {
 		return (
 			<style>
-				.list {
-					this.customStyle
-				}
-
 				.wrapper {
 					{
-						'background-color': 'yellow',
-						'color': 'green'
+						background: '#000',
+						width: '100vw',
+						height: '100vh'
+					}
+				}
+
+				.star + .star {
+					{
+						'background-size': '500px'
+					}
+				}
+
+				.stas + .star + .star {
+					{
+						'background-size': '700px'
 					}
 				}
 			</style>
@@ -83,32 +129,21 @@ export class App {
 
 	render() {
 		return (
-			<div id="ivan" className={this.className}>
-				<exf-rocket items={this.list} />
+			<div id="wrapper" className="wrapper">
+				{
+					this._stars.map(star => {
+						return <exf-star position={star} />
+					})
+				}
 
-				<div style={{ backgroundColor: 'black' }}>
-					<button onClick={this.handleClick.bind(this)}>Add Item</button>
+				<exf-spaceship 
+					top={this._spaceshipParams.top} 
+					left={this._spaceshipParams.left} 
+					engine={this._spaceshipParams.engine} 
+					direction={this._spaceshipParams.direction}
+				/>
 
-					<button onClick={this.handleRemove}>Remove Item</button>
-
-					<button onClick={this.handleClassName}>Change className</button>
-
-					<button onClick={this.handleSubmit}>Submit</button>
-
-					<button onClick={this.handleStyle}>Style</button>
-				</div>
-
-				<input value={this.name} onInput={this.handleInput} />
-
-				<div id="pesho">
-					<p className={this.className}>{this.name}</p>
-				</div>
-				
-				<ul className="list">
-					{this.list.map(item => {
-						return <li>{item}</li>
-					})}
-				</ul>
+				<exf-asteroid />
 			</div>
 		)
 	}
