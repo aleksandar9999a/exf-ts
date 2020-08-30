@@ -21,6 +21,10 @@ export interface IExFModule {
     root?: string
 }
 
+export interface Props {
+    [key: string]: any
+}
+
 type RequestIdleCallbackHandle = any;
 
 type RequestIdleCallbackOptions = {

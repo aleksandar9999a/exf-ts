@@ -1,10 +1,7 @@
-import { IWorkLoop, IElementRepresentation } from '../interfaces/interfaces';
+import { IWorkLoop, IElementRepresentation, Props } from '../interfaces/interfaces';
 import { pushWork } from '../workLoop/work-loop';
 import { representationParser, extractChanges } from '../virualDomBuilder';
 
-interface Props {
-	[key: string]: any
-}
 
 export function Component({ selector }: { selector: string }): any {
 	return function componentDecorator(target: any) {
