@@ -20,6 +20,7 @@ export function Component({ selector }: { selector: string }): any {
 			stylize!: Function;
 			props: Props = {};
 
+
 			constructor() {
 				super();
 				target.call(this);
@@ -28,7 +29,8 @@ export function Component({ selector }: { selector: string }): any {
 				this.html = representationParser(this.representation);
 				
 				this.root.appendChild(this.html);
-				if(!!this.stylize) {
+
+				if(!! this.stylize) {
 					const styleRep = this.stylize();
 					this.ctorStyle = ExFStylize(styleRep);
 					this.root.appendChild(this.ctorStyle);
@@ -36,6 +38,10 @@ export function Component({ selector }: { selector: string }): any {
 			}
 
 			updateStyle() {
+				if(! this.stylize) {
+					return;
+				}
+				
 				pushWork(() => {
 					const newRep = this.stylize();
 
