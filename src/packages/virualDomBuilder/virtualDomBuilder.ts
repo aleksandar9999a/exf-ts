@@ -109,10 +109,6 @@ function updateHTML({ parent, childrens, changes }: IUpdateHTML) {
 		const currEl = childrens[change.elementIndex];
 		const propKeys = Object.keys(change.props || {});
 
-		if(parent.nodeName === 'STYLE') {
-			return;
-		}
-
 		propKeys.forEach((key: any) => {
 			(currEl as any)[key] = change.props[key];
 		})

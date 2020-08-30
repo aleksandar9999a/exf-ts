@@ -27,13 +27,12 @@ export function Component({ selector }: { selector: string }): any {
 				this.representation = this.render();
 				this.html = representationParser(this.representation);
 				
+				this.root.appendChild(this.html);
 				if(!!this.stylize) {
 					const styleRep = this.stylize();
 					this.ctorStyle = ExFStylize(styleRep);
 					this.root.appendChild(this.ctorStyle);
 				}
-				
-				this.root.appendChild(this.html);
 			}
 
 			updateStyle() {
