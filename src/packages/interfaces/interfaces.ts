@@ -14,11 +14,6 @@ export interface IWorkLoop {
     pushWork: (work: Function) => void;
 }
 
-export interface IChange {
-    name: string,
-    value: any
-}
-
 type RequestIdleCallbackHandle = any;
 
 type RequestIdleCallbackOptions = {
@@ -38,9 +33,4 @@ declare global {
         ) => RequestIdleCallbackHandle);
         cancelIdleCallback: ((handle: RequestIdleCallbackHandle) => void);
     }
-}
-
-export interface IStyleItem {
-    selector: string,
-    styles: { [key: string]: string }[]
 }
