@@ -1,63 +1,77 @@
-import ExF, { Component, State, Attribute } from './packages';
+import ExF, { Component, State } from './packages';
 
 @Component({
-    selector: 'exf-app'
+	selector: 'exf-app'
 })
 export class App {
-    green = 'green';
+	green = 'green';
 
-    @Attribute
-    dir: any;
+	@State
+	className = '1';
+	
+	@State
+	name = 'alex';
 
-    @State
-    className = '1';
-    
-    @State
-    name = 'alex';
+	@State
+	list: string[] = ['i','i','i'];
 
-    @State
-    list: string[] = ['i','i','i'];
+	handleClick = (e: any) => {
+		this.list = [...this.list, 'ivaneeee'];
+	}
 
-    handleClick = (e: any) => {
-        this.list = [...this.list, 'ivaneeee'];
-    }
+	handleRemove = (e: any) => {
+		this.list = this.list.slice(0, this.list.length - 1)
+	}
 
-    handleRemove = (e: any) => {
-        this.list = this.list.slice(0, this.list.length - 1)
-    }
+	handleClassName = (e: any) => {
+		this.className = '2'
+	}
 
-    handleClassName = (e: any) => {
-        this.className = '2'
-    }
+	handleInput = (e: any) => {
+		this.name = e.target.value;
+	}
 
-    handleInput = (e: any) => {
-        this.name = e.target.value;
-    }
+	handleSubmit = () => {
+		this.list = [...this.list, this.name];
+		this.name = '';
+	}
 
-    log() {
-        console.log('work')
-    }
+	handleRocket = () => {
+		console.log('rocket')
+	}
 
-    render() {
-        return (
-            <div id="ivan" className={this.className}>
-            <exf-rocket />
-                {/* <p>{this.dir}</p>
-                <div style={{ backgroundColor: 'black' }}>
-                    <button onClick={this.handleClick}>Add Item</button>
-                    <button onClick={this.handleRemove}>Remove Item</button>
-                    <button onClick={this.handleClassName}>Change className</button>
-                </div>
-                <input onInput={this.handleInput} />
-                <div>
-                    <p className={this.className}>{this.name}</p>
-                </div>
-                <div>
-                    {this.list.map(item => {
-                        return <p>{item}</p>
-                    })}
-                </div> */}
-            </div>
-        )
-    }
+	log() {
+		console.log('work');
+	}
+
+	render() {
+		return (
+			<div id="ivan" className={this.className}>
+
+				<exf-rocket items={this.list} />
+
+				<div style={{ backgroundColor: 'black' }}>
+					<button onClick={this.handleClick}>Add Item</button>
+
+					<button onClick={this.handleRemove}>Remove Item</button>
+
+					<button onClick={this.handleClassName}>Change className</button>
+
+					<button onClick={this.handleSubmit}>Submit</button>
+				</div>
+
+				<input value={this.name} onInput={this.handleInput} />
+
+				<div>
+					<p className={this.className}>{this.name}</p>
+				</div>
+				
+				<div>
+					{this.list.map(item => {
+						return <p>{item}</p>
+					})}
+				</div>
+			</div>
+		)
+	}
 }

@@ -23,6 +23,40 @@ function elementParser(child: IElementRepresentation | string) {
  * @returns {HTMLElement}
  */
 export function representationParser({ tag, props, children }: IElementRepresentation) {
+	return tag.includes('-')
+		? createCustomElement({ tag, props, children })
+		: createIntrinsicElement({ tag, props, children })
+}
+
+/**
+ * Create a Custom Web Component - HTML Element
+ * 
+ * @param {IElementRepresentation}
+ *
+ * @return {HTMLElement}
+ */
+function createCustomElement({ tag, props, children }: IElementRepresentation) {
+	const el = document.createElement(tag);
+
+	Object.keys(props || {}).forEach((key: string) => {
+		(el as any).setProps(key, (props as any)[key])
+	})
+
+	children.map(elementParser).forEach((child: any) => {
+		el.appendChild(child);
+	});
+
+	return el;
+}
+
+/**
+ * Create ordinary HTML Element
+ * 
+ * @param {IElementRepresentation}
+ *
+ * @return {HTMLElement}
+ */
+function createIntrinsicElement({ tag, props, children }: IElementRepresentation) {
 	const el = document.createElement(tag);
 	
 	Object.keys(props || {}).forEach(key => {

@@ -1,9 +1,9 @@
 import { Component } from './Component';
-import { Attribute } from './Attributes';
+import { Props } from './Props';
 import { State } from './State';
 
 export {
     Component,
-    Attribute,
+    Props,
     State
 }

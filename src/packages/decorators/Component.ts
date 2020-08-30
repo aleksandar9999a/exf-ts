@@ -2,13 +2,18 @@ import { IWorkLoop, IElementRepresentation } from '../interfaces/interfaces';
 import { pushWork } from '../workLoop/work-loop';
 import { representationParser, extractChanges } from '../virualDomBuilder';
 
+interface Props {
+	[key: string]: any
+}
+
 export function Component({ selector }: { selector: string }): any {
 	return function componentDecorator(target: any) {
 		class Ctor extends HTMLElement {
 			root: ShadowRoot;
 			representation: IElementRepresentation;
 			html: HTMLElement;
-			render: any;
+			render!: Function;
+			props: Props = {};
 
 			constructor() {
 				super();
@@ -26,6 +31,15 @@ export function Component({ selector }: { selector: string }): any {
 					this.representation = newRep;
 					return commit;
 				})
+			}
+
+			setProps(key: string, value: any) {
+				this.props[key] = value;
+				this.update();
+			}
+
+			getProps(key: string) {
+				return this.props[key];
 			}
 		}
 
