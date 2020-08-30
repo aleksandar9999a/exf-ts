@@ -1,18 +1,21 @@
-import { IElementRepresentation } from './../interfaces/interfaces';
+import { IElementRepresentation, ICtorStyle, ICtorStyleChange } from './../interfaces/interfaces';
 
 /**
- * Create Style Element
+ * Create Style Elements
  * 
- * @param {IElementRepresentation}
+ * @param {IElementRepresentation[]}
  *
- * @return {HTMLElement}
+ * @return {ICtorStyle}
  */
-export function ExFStylize({ tag, children }: IElementRepresentation) {
-	const style = document.createElement(tag);
-
-	style.textContent = createStyleContent(children);
+export function ExFStylize(children: IElementRepresentation[]) {
+	const content = createStyleContent(children);
+	const styles = content.map((text: string) => {
+		const style = document.createElement('style');
+		style.textContent = text;
+		return style;
+	})
 	
-	return style;
+	return { styles, content };
 }
 
 /**
@@ -20,37 +23,52 @@ export function ExFStylize({ tag, children }: IElementRepresentation) {
  * 
  * @param {IElementRepresentation[]}
  *
- * @return {String}
+ * @return {String[]}
  */
 function createStyleContent(children: IElementRepresentation[]) {
-	return children.reduce((text, child) => {
+	const allStyles = children.reduce((arr: any, child) => {
 		if(typeof child === 'string') {
-			return `${text} ${text.length > 0 ? '}' : ''} ${child} {`
+			if(arr.length > 0) {
+				arr[arr.length - 1] += ' }';
+			}
+
+			arr.push(`${(child as string).trim()} {`);
+		} else {
+			Object.keys(child).forEach(key => {
+				arr[arr.length - 1] += ` ${key}: ${(child as any)[key]};`
+			})
 		}
 
-		Object.keys(child).forEach(key => {
-			text += `${key}: ${(child as any)[key]};`
-		})
+		return arr;
+	}, []);
 
-		return text;
-	}, '') + '}';
+	allStyles[allStyles.length - 1] += ' }';
+
+	return allStyles;
 }
 
 /**
  * Compare old and new style content and return commit function
  * 
- * @param {HTMLElement}
- * @param {IElementRepresentation[]}
+ * @param {ICtorStyle} style
+ * @param {IElementRepresentation[]} rep
  *
  * @return {Function}
  */
-export function extractStyleChanges(style: HTMLElement, rep: IElementRepresentation[]) {
-	const currStyles = style.textContent;
+export function extractStyleChanges(style: ICtorStyle, rep: IElementRepresentation[]) {
+	const { styles, content } = style;
 	const newStyles = createStyleContent(rep);
+	const changes: ICtorStyleChange[] = [];
 
-	return currStyles === newStyles
-		? () => {}
-		: () => {
-			style.textContent = newStyles;
+	newStyles.forEach((text: string, i: number) => {
+		if(text !== content[i]) {
+			changes.push({ element: styles[i], content: text });
 		}
+	})
+
+	return () => {
+		changes.forEach(({ element, content }) => {
+			element.textContent = content;
+		})
+	}
 }

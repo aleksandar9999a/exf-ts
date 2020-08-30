@@ -1,4 +1,4 @@
-import { IWorkLoop, IElementRepresentation, Props } from '../interfaces/interfaces';
+import { IWorkLoop, IElementRepresentation, Props, ICtorStyle } from '../interfaces/interfaces';
 import { pushWork } from '../workLoop/work-loop';
 import { representationParser, extractChanges, ExFStylize, extractStyleChanges } from '../virualDomBuilder';
 
@@ -15,7 +15,7 @@ export function Component({ selector }: { selector: string }): any {
 			root: ShadowRoot;
 			representation: IElementRepresentation;
 			html: HTMLElement;
-			ctorStyle: HTMLElement | undefined;
+			ctorStyle!: ICtorStyle;
 			render!: Function;
 			stylize!: Function;
 			props: Props = {};
@@ -32,8 +32,11 @@ export function Component({ selector }: { selector: string }): any {
 
 				if(!! this.stylize) {
 					const styleRep = this.stylize();
-					this.ctorStyle = ExFStylize(styleRep);
-					this.root.appendChild(this.ctorStyle);
+					this.ctorStyle = ExFStylize(styleRep.children);
+
+					this.ctorStyle.styles.forEach(style => {
+						this.root.appendChild(style);
+					})
 				}
 			}
 
@@ -45,7 +48,7 @@ export function Component({ selector }: { selector: string }): any {
 				pushWork(() => {
 					const newRep = this.stylize();
 
-					return extractStyleChanges(this.ctorStyle as HTMLElement, newRep.children);
+					return extractStyleChanges(this.ctorStyle, newRep.children);
 				})
 			}
 

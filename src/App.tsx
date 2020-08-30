@@ -20,7 +20,7 @@ export class App {
 	}
 
 	@State
-	className = '1';
+	className = 'wrapper';
 	
 	@State
 	name = 'alex';
@@ -38,7 +38,7 @@ export class App {
 	}
 
 	handleClassName = (e: any) => {
-		this.className = '2'
+		this.className = 'container';
 	}
 
 	handleInput = (e: any) => {
@@ -69,6 +69,13 @@ export class App {
 			<style>
 				.list {
 					this.customStyle
+				}
+
+				.wrapper {
+					{
+						'background-color': 'yellow',
+						'color': 'green'
+					}
 				}
 			</style>
 		)
