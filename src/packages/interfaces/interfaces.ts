@@ -18,7 +18,7 @@ export interface IExFModule {
     components?: any[],  
     modules?: IExFModule[],  
     bootstraps?: any[],
-    root: string
+    root?: string
 }
 
 type RequestIdleCallbackHandle = any;

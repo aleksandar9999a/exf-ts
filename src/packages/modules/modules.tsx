@@ -2,8 +2,8 @@
 import { IExFModule } from './../interfaces/interfaces';
 
 const container = {	
-    components: {},	
-    bootstraps: {}	
+	components: {},	
+	bootstraps: {}	
 }
 
 /**
@@ -16,15 +16,15 @@ const container = {
  * @return {Object}
  */
 function createComponent(Ctor: any, innerHTML?: string, bindings?: Object) {  
-    const instance = new Ctor();  
+	const instance = new Ctor();  
 
-    instance.textContent = innerHTML;  
+	instance.textContent = innerHTML;  
 
-    Object.entries(bindings || {}).forEach(([key, value]) => {  
-        instance[key] = value;  
-    });  
+	Object.entries(bindings || {}).forEach(([key, value]) => {  
+		instance[key] = value;  
+	});  
 
-    return instance;  
+	return instance;  
 } 
 
 /**
@@ -36,10 +36,10 @@ function createComponent(Ctor: any, innerHTML?: string, bindings?: Object) {
  * @return {Void}
  */
 function bootstrap(id: string, component: any) {  
-    const container = document.getElementById(id);  
-    const instance = createComponent(component);  
+	const container = document.getElementById(id);  
+	const instance = createComponent(component);  
 
-    container?.appendChild(instance);  
+	container?.appendChild(instance);  
 } 
 
 /**
@@ -51,13 +51,13 @@ function bootstrap(id: string, component: any) {
  * @return {Void}
  */
 function register(target: any, cmp: any,) {	
-    const selector = Reflect.getMetadata('component:selector', cmp);	
-    
-    if (target[selector]) {	
-        throw new Error(`Component ${selector} is already registered!`);	
-    }	
-    
-    target[selector] = cmp;	
+	const selector = Reflect.getMetadata('component:selector', cmp);	
+	
+	if (target[selector]) {	
+		throw new Error(`Component ${selector} is already registered!`);	
+	}	
+	
+	target[selector] = cmp;	
 }
 
 /**
@@ -68,13 +68,15 @@ function register(target: any, cmp: any,) {
  * @returns {Void}
  */
 export function ExFModule({ components, modules, bootstraps, root }: IExFModule) {	
-    (components || []).forEach(cmp => {
-        register(container.components, cmp);
-    });
+	(components || []).forEach(cmp => {
+		register(container.components, cmp);
+	});
 
-    (modules || []).forEach(ExFModule); 
-
-    (bootstraps || []).forEach(cmp => {
-            bootstrap(root, cmp);
-    });
+	(modules || []).forEach(ExFModule); 
+	
+	if(!! root) {
+		(bootstraps || []).forEach(cmp => {
+			bootstrap(root, cmp);
+		});
+	}
 }
