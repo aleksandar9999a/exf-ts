@@ -98,7 +98,7 @@ function updateHTML({ parent, childrens, changes }: IUpdateHTML) {
 		} 
 
 		if(!! change.children && ! currEl) {
-			change.children.forEach((el: any) => {
+			change.children.forEach((el: IElementRepresentation | string) => {
 				parent.appendChild(elementParser(el));
 			})
 		}
@@ -113,7 +113,7 @@ function updateHTML({ parent, childrens, changes }: IUpdateHTML) {
  * 
  * @returns {Array}
  */
-function compareRepresentations(oldState: IElementRepresentation[], newState: IElementRepresentation[]) {
+function compareRepresentations(oldState: IElementRepresentation[] = [], newState: IElementRepresentation[] = []) {
 	let changes: any = [];
 
 	oldState.forEach((oldEl, i) => {
@@ -162,7 +162,7 @@ function compareRepresentations(oldState: IElementRepresentation[], newState: IE
 			}
 		})
 
-		const children = compareRepresentations(oldEl.children || [], newEl.children || []);
+		const children = compareRepresentations(oldEl.children, newEl.children);
 		
 		if(children.length > 0) {
 			change.children = children;
