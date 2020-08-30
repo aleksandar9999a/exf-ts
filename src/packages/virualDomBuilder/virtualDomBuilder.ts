@@ -49,6 +49,7 @@ export function representationParser({ tag, props, children }: IElementRepresent
 /**
  * Extract changes and return commit function
  * 
+ * @param {NodeListOf<ChildNode>} childNodes 
  * @param {IElementRepresentation} firstRep 
  * @param {IElementRepresentation} secondRep 
  * 
@@ -92,7 +93,7 @@ function updateHTML({ parent, childrens, changes }: IUpdateHTML) {
 				childrens: currEl.childNodes,
 				changes: change.children
 			})
-			
+
 			return;
 		} 
 
@@ -105,7 +106,7 @@ function updateHTML({ parent, childrens, changes }: IUpdateHTML) {
 }
 
 /**
- * Compare Representation 
+ * Compare Representation and extract changes
  * 
  * @param {IElementRepresentation[]} oldState 
  * @param {IElementRepresentation[]} newState 
