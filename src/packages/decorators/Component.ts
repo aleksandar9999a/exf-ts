@@ -2,7 +2,13 @@ import { IWorkLoop, IElementRepresentation, Props } from '../interfaces/interfac
 import { pushWork } from '../workLoop/work-loop';
 import { representationParser, extractChanges } from '../virualDomBuilder';
 
-
+/**
+ * Component Decorator
+ * 
+ * @param  {Object}
+ * 
+ * @return {Function}
+ */
 export function Component({ selector }: { selector: string }): any {
 	return function componentDecorator(target: any) {
 		class Ctor extends HTMLElement {

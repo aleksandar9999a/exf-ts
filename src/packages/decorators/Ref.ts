@@ -1,3 +1,10 @@
+/**
+ * Ref Decorator
+ * 
+ * @param  {Object}
+ * 
+ * @return {Function}
+ */
 export function Ref({ id }: { id: string }): any {
 	return function (target: any, key: string) {
 		Object.defineProperty(target, key, {
