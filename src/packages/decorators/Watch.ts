@@ -39,6 +39,19 @@ function findStyleProp(target: any, key: string) {
 }
 
 /**
+ * Find props
+ * 
+ * @param {Any} target
+ * @param {String} key
+ *
+ * @returns {Bool}
+ */
+function findProps(target: any, key: string) {
+	const props = Reflect.getMetadata('component:props', target) || [];
+	return props.includes(key);
+}
+
+/**
  * Watch Decorator
  * 
  * @param  {String} key
@@ -55,7 +68,7 @@ export function Watch(key: string ): any {
 		if(typeof currentProperty === 'function') {
 			target[key] = function (this: any, ...args: any[]) {
 				currentProperty.bind(this)(...args);
-				currentMethod(...args);
+				currentMethod.bind(this)(...args);
 
 				if(findStateProp(target, key)) {
 					this.update();
@@ -72,11 +85,18 @@ export function Watch(key: string ): any {
 
 		Object.defineProperty(target, key, {
 			set(newValue) {
+				if(findProps(target, key)) {
+					this.setProps(key, newValue);
+					currentMethod.bind(this)(newValue, val);
+					val = newValue;
+					return;
+				}
+
 				const oldValue = val;
 				val = newValue;
 
-				currentMethod(newValue, oldValue);
-
+				currentMethod.bind(this)(newValue, oldValue);
+				
 				if(findStateProp(target, key)) {
 					this.update();
 				}
@@ -86,6 +106,10 @@ export function Watch(key: string ): any {
 				}
 			},
 			get() {
+				if(findProps(target, key)) {
+					return this.getProps(key);
+				}
+
 				return val;
 			}
 		});
