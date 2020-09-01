@@ -1,4 +1,4 @@
-import ExF, { Component, State, Props } from '../packages';
+import ExF, { Component, Watch, Props, Style } from '../packages';
 
 @Component({
 	selector: 'exf-star'
@@ -11,9 +11,6 @@ export default class Star {
 	}
 
 	stylize() {
-		const x = { 'background-position-x': this.position['background-position-x'] + 'px' };
-		const y = { 'background-position-y': this.position['background-position-y'] + 'px' };
-
 		return (
 			<style>
 				.star {
@@ -34,11 +31,15 @@ export default class Star {
 				}
 
 				.star {
-					x
+					{ 
+						'background-position-x': this.position['background-position-x'] + 'px' 
+					}
 				}
 
 				.star {
-					y
+					{ 
+						'background-position-y': this.position['background-position-y'] + 'px' 
+					}
 				}
 			</style>
 		)

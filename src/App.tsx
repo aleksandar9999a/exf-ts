@@ -10,71 +10,57 @@ export class App {
 	asteroid!: HTMLElement;
 	spaceship!: any;
 
-	_step = 20;
+	@State
+	engine = false;
+
+	@State
+	direction = 'right';
 
 	_actions: { [key: string]: Function } = {
 		ArrowUp: () => {
-			this._stars = this._stars.map((star, i) => {
-				return { 
-					...star, 
-					'background-position-y': star['background-position-y'] + i + 1
-				}
-			})
-			this._spaceshipParams = { 
-				...this._spaceshipParams, 
-				top: this._spaceshipParams.top - this._step,
-				direction: 'up'
-			}
+			this.direction = 'up';
 		},
 		ArrowDown: () => {
-			this._stars = this._stars.map((star, i) => {
-				return { 
-					...star, 
-					'background-position-y': star['background-position-y'] - i + 1
-				}
-			})
-
-			this._spaceshipParams = { 
-				...this._spaceshipParams, 
-				top: this._spaceshipParams.top + this._step,
-				direction: 'down'
-			}
+			this.direction = 'down';
 		},
 		ArrowLeft: () => {
-			this._stars = this._stars.map((star, i) => {
-				return { 
-					...star, 
-					'background-position-x': star['background-position-x'] + i + 1
-				}
-			})
-			this._spaceshipParams = { 
-				...this._spaceshipParams, 
-				left: this._spaceshipParams.left - this._step,
-				direction: 'left' 
-			}
+			this.direction = 'left';
 		},
 		ArrowRight: () => {
-			this._stars = this._stars.map((star, i) => {
-				return { 
-					...star, 
-					'background-position-x': star['background-position-x'] - i + 1
-				}
-			})
-			this._spaceshipParams = {
-				...this._spaceshipParams, 
-				left: this._spaceshipParams.left + this._step,
-				direction: 'right' 
-			}
+			this.direction = 'right';
 		},
+		Space: () => {
+			this.engine = !this.engine;
+		}
 	}
 
-	@State
-	_spaceshipParams = {
-		top: 0,
-		left: 0,
-		engine: false,
-		direction: 'right'
+	@Watch('engine') 
+	animateStars() {
+		if(!this.engine) {
+			return;
+		}
+
+		const position = this.direction === 'right' || this.direction === 'left'
+			? `background-position-x`
+			: `background-position-y`
+
+		this._stars = this._stars.map((star, i) => {
+			if(this.direction === 'right' || this.direction === 'down') {
+				return {
+					...star,
+					[position]: star[position] - i - 1
+				}
+			}
+
+			return {
+				...star,
+				[position]: star[position] + i + 1
+			}
+		})
+
+		requestAnimationFrame(this.animateStars.bind(this))
 	}
+
 
 	connectedCallback() {
 		document.addEventListener('keydown', this.handleKeyPress.bind(this))
@@ -92,11 +78,9 @@ export class App {
 
 	animate(action: Function) {
 		if (this.detectCollision()) {
-			this._spaceshipParams = { ...this._spaceshipParams, engine: false };
+			this.engine = false;
 			return;
 		}
-
-		this._spaceshipParams = { ...this._spaceshipParams, engine: true };
 
 		action();
 	}
@@ -136,11 +120,9 @@ export class App {
 					})
 				}
 
-				<exf-spaceship 
-					top={this._spaceshipParams.top} 
-					left={this._spaceshipParams.left} 
-					engine={this._spaceshipParams.engine} 
-					direction={this._spaceshipParams.direction}
+				<exf-spaceship
+					engine={this.engine} 
+					direction={this.direction}
 				/>
 
 				<exf-asteroid />

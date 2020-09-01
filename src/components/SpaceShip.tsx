@@ -1,4 +1,4 @@
-import ExF, { Component, State, Props, Style } from '../packages';
+import ExF, { Component, Watch, Props, Style } from '../packages';
 
 @Component({
 	selector: 'exf-spaceship'
@@ -12,16 +12,40 @@ export default class SpaceShip {
 	}
 
 	@Props
-	direction = ''
+	direction = '';
 
-	@Props
-	left = 0
+	@Style
+	left = 0;
 
-	@Props
-	top = 0
+	@Style
+	top = 0;
 
 	@Props
 	engine = false;
+
+
+	@Watch('engine')
+	animate() {
+		if(this.direction === 'right') {
+			this.left = this.left + 1;
+		}
+
+		if(this.direction === 'left') {
+			this.left = this.left - 1;
+		}
+
+		if(this.direction === 'up') {
+			this.top = this.top - 1;
+		}
+
+		if(this.direction === 'down') {
+			this.top = this.top + 1;
+		}
+
+		if(this.engine) {
+			requestAnimationFrame(this.animate.bind(this));
+		}
+	}
 	
 	stylize() {
 		const left = this.left + 'px';
