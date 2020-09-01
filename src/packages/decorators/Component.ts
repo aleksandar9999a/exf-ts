@@ -46,8 +46,10 @@ export function Component({ selector }: { selector: string }): any {
 				
 				pushWork(() => {
 					const newRep = this.stylize();
+					const { rep, commit } = extractStyleChanges(this.ctorStyle, newRep.children);
+					this.ctorStyle.content = rep;
 
-					return extractStyleChanges(this.ctorStyle, newRep.children);
+					return commit;
 				})
 			}
 

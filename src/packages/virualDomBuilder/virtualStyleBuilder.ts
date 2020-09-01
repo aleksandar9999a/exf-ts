@@ -66,9 +66,12 @@ export function extractStyleChanges(style: ICtorStyle, rep: IElementRepresentati
 		}
 	})
 
-	return () => {
-		changes.forEach(({ element, content }) => {
-			element.textContent = content;
-		})
+	return {
+		rep: newStyles,
+		commit: () => {
+			changes.forEach(({ element, content }) => {
+				element.textContent = content;
+			})
+		}
 	}
 }
