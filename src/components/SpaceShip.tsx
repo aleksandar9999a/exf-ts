@@ -14,38 +14,14 @@ export default class SpaceShip {
 	@Props
 	direction = '';
 
-	@Style
+	@Props
 	left = 0;
 
-	@Style
+	@Props
 	top = 0;
 
 	@Props
 	engine = false;
-
-
-	@Watch('engine')
-	animate() {
-		if(this.direction === 'right') {
-			this.left = this.left + 1;
-		}
-
-		if(this.direction === 'left') {
-			this.left = this.left - 1;
-		}
-
-		if(this.direction === 'up') {
-			this.top = this.top - 1;
-		}
-
-		if(this.direction === 'down') {
-			this.top = this.top + 1;
-		}
-
-		if(this.engine) {
-			requestAnimationFrame(this.animate.bind(this));
-		}
-	}
 	
 	stylize() {
 		const left = this.left + 'px';

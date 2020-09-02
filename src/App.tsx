@@ -16,6 +16,12 @@ export class App {
 	@State
 	direction = 'right';
 
+	@State
+	left = 0;
+
+	@State
+	top = 0;
+
 	_actions: { [key: string]: Function } = {
 		ArrowUp: () => {
 			this.direction = 'up';
@@ -35,11 +41,18 @@ export class App {
 	}
 
 	@Watch('engine') 
-	animateStars() {
-		if(!this.engine) {
+	animate() {
+		if(!this.engine || this.detectCollision()) {
 			return;
 		}
 
+		this.animateStars();
+		this.animateSpaceShip();
+
+		requestAnimationFrame(this.animate.bind(this))
+	}
+
+	animateStars() {
 		const position = this.direction === 'right' || this.direction === 'left'
 			? `background-position-x`
 			: `background-position-y`
@@ -57,10 +70,25 @@ export class App {
 				[position]: star[position] + i + 1
 			}
 		})
-
-		requestAnimationFrame(this.animateStars.bind(this))
 	}
 
+	animateSpaceShip() {
+		if(this.direction === 'right') {
+			this.left = this.left + 1;
+		}
+
+		if(this.direction === 'left') {
+			this.left = this.left - 1;
+		}
+
+		if(this.direction === 'up') {
+			this.top = this.top - 1;
+		}
+
+		if(this.direction === 'down') {
+			this.top = this.top + 1;
+		}
+	}
 
 	connectedCallback() {
 		document.addEventListener('keydown', this.handleKeyPress.bind(this))
@@ -68,21 +96,13 @@ export class App {
 
 	handleKeyPress(e: any) {
 		if(typeof this._actions[e.code] === 'function') {
-			this.animate(this._actions[e.code]);
+			this._actions[e.code]();
 		}
 	}
 
 	detectCollision() {
+		this.engine = false;
 		return false;
-	}
-
-	animate(action: Function) {
-		if (this.detectCollision()) {
-			this.engine = false;
-			return;
-		}
-
-		action();
 	}
 
 	stylize() {
@@ -123,6 +143,8 @@ export class App {
 				<exf-spaceship
 					engine={this.engine} 
 					direction={this.direction}
+					left={this.left}
+					top={this.top}
 				/>
 
 				<exf-asteroid />
