@@ -1,3 +1,4 @@
+import { metakeys } from './metakeys';
 /**
  * Define metadate
  * 
@@ -35,7 +36,7 @@ function find(metakey: string, target: any, key: string) {
  * @return {Bool}
  */
 export function findWatchedProp(target: any, key: string) {
-	return find('component:watches', target, key);
+	return find(metakeys.META_WATCHES, target, key);
 }
 
 /**
@@ -47,7 +48,7 @@ export function findWatchedProp(target: any, key: string) {
  * @return {Void}
  */
 export function defineProp(target: any, key: string) {
-	define('component:props', target, key);
+	define(metakeys.META_PROPS, target, key);
 }
 
 /**
@@ -59,7 +60,7 @@ export function defineProp(target: any, key: string) {
  * @return {Void}
  */
 export function defineState(target: any, key: string) {
-	define('component:states', target, key);
+	define(metakeys.META_STATE, target, key);
 }
 
 /**
@@ -71,7 +72,7 @@ export function defineState(target: any, key: string) {
  * @return {Void}
  */
 export function defineStyle(target: any, key: string) {
-	define('component:style', target, key);
+	define(metakeys.META_STYLE, target, key);
 }
 
 /**
@@ -84,7 +85,7 @@ export function defineStyle(target: any, key: string) {
  * @return {Void}
  */
 export function defineWatch(target: any, key: string, method: any) {
-		define('component:watches', target, key);
+		define(metakeys.META_WATCHES, target, key);
 }
 
 /**
@@ -96,7 +97,7 @@ export function defineWatch(target: any, key: string, method: any) {
  * @returns {Bool}
  */
 export function findStateProp(target: any, key: string) {
-	return find('component:states', target, key);
+	return find(metakeys.META_STATE, target, key);
 }
 
 /**
@@ -108,7 +109,7 @@ export function findStateProp(target: any, key: string) {
  * @returns {Bool}
  */
 export function findStyleProp(target: any, key: string) {
-	return find('component:style', target, key);
+	return find(metakeys.META_STYLE, target, key);
 }
 
 /**
@@ -120,5 +121,5 @@ export function findStyleProp(target: any, key: string) {
  * @returns {Bool}
  */
 export function findProps(target: any, key: string) {
-	return find('component:props', target, key);
+	return find(metakeys.META_PROPS, target, key);
 }
