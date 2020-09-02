@@ -24,14 +24,6 @@ export default class SpaceShip {
 	engine = false;
 	
 	stylize() {
-		const left = this.left + 'px';
-		const top = this.top + 'px';
-		const engine = this.engine
-			? { 'background-position': '-210px 0px' }
-			: { 'background-position': '0px 0px' }
-
-		const direction = { 'transform': `rotate(${this._directionsMap[this.direction]}deg)` }
-
 		return (
 			<style>
 				div {
@@ -47,7 +39,7 @@ export default class SpaceShip {
 						'background-size': '420px 210px',
 				
 						'transition-delay': '0s',
-						'transition-duration': '50ms',
+						'transition-duration': '550ms',
 						'transition-property': 'transform',
 						'transition-timing-function': 'linear',
 					
@@ -56,19 +48,27 @@ export default class SpaceShip {
 				}
 
 				div {
-					direction
+					{ 
+						'transform': `rotate(${this._directionsMap[this.direction]}deg)` 
+					}
 				}
 
 				div {
-					{ left }
+					{ 
+						left: this.left + 'px' 
+					}
 				}
 
 				div {
-					{ top }
+					{ 
+						top: this.top + 'px' 
+					}
 				}
 
 				div {
-					engine
+					this.engine
+						? { 'background-position': '-210px 0px' }
+						: { 'background-position': '0px 0px' }
 				}
 			</style>
 		)
