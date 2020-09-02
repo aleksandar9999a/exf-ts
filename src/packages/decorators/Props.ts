@@ -1,31 +1,4 @@
-/**
- * Find watched prop if it is registered
- * 
- * @param {Any} target
- * @param {String} key
- *
- * @return {Undefined | Object}
- */
-function findWatchedProp(target: any, key: string) {
-	const watches = Reflect.getMetadata('component:watches', target) || [];
-
-	return watches.find((prop: Object) => {
-		return Object.keys(prop).includes(key);
-	})
-}
-
-/**
- * Define prop as Metadata
- * 
- * @param {Any} target
- * @param {String} key
- *
- * @return {Void}
- */
-function defineProp(target: any, key: string) {
-	const props = Reflect.getMetadata('component:props', target) || [];
-	Reflect.defineMetadata('component:props', [...props, key], target);
-}
+import { defineProp, findWatchedProp } from './../metadata/metadata';
 
 /**
  * Props Decorator
