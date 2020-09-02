@@ -1,17 +1,41 @@
 /**
+ * Define metadate
+ * 
+ * @param {String} metakey
+ * @param {Any}    target
+ * @param {String} key
+ *
+ * @return {Void}
+ */
+function define(metakey: string, target: any, key: string) {
+	const data = Reflect.getMetadata(metakey, target) || [];
+	Reflect.defineMetadata(metakey, [...data, key], target);
+}
+
+/**
+ * Find key in metadata
+ * 
+ * @param {String} metakey
+ * @param {Any}    target
+ * @param {String} key
+ *
+ * @return {Bool}
+ */
+function find(metakey: string, target: any, key: string) {
+	const data = Reflect.getMetadata(metakey, target, key) || [];
+	return data.includes(key);
+}
+
+/**
  * Find watched prop if it is registered
  * 
  * @param {Any} target
  * @param {String} key
  *
- * @return {Undefined | Object}
+ * @return {Bool}
  */
 export function findWatchedProp(target: any, key: string) {
-	const watches = Reflect.getMetadata('component:watches', target) || [];
-
-	return watches.find((prop: Object) => {
-		return Object.keys(prop).includes(key);
-	})
+	return find('component:watches', target, key);
 }
 
 /**
@@ -23,8 +47,7 @@ export function findWatchedProp(target: any, key: string) {
  * @return {Void}
  */
 export function defineProp(target: any, key: string) {
-	const props = Reflect.getMetadata('component:props', target) || [];
-	Reflect.defineMetadata('component:props', [...props, key], target);
+	define('component:props', target, key);
 }
 
 /**
@@ -36,10 +59,8 @@ export function defineProp(target: any, key: string) {
  * @return {Void}
  */
 export function defineState(target: any, key: string) {
-	const states = Reflect.getMetadata('component:states', target) || [];
-	Reflect.defineMetadata('component:states', [...states, key], target);
+	define('component:states', target, key);
 }
-
 
 /**
  * Define style prop as Metadata
@@ -50,8 +71,7 @@ export function defineState(target: any, key: string) {
  * @return {Void}
  */
 export function defineStyle(target: any, key: string) {
-	const styles = Reflect.getMetadata('component:style', target) || [];
-	Reflect.defineMetadata('component:style', [...styles, key], target);
+	define('component:style', target, key);
 }
 
 /**
@@ -64,8 +84,7 @@ export function defineStyle(target: any, key: string) {
  * @return {Void}
  */
 export function defineWatch(target: any, key: string, method: any) {
-		const watches = Reflect.getMetadata('component:watches', target) || [];
-		Reflect.defineMetadata('component:watches', [...watches, { [key]: method }], target);
+		define('component:watches', target, key);
 }
 
 /**
@@ -77,8 +96,7 @@ export function defineWatch(target: any, key: string, method: any) {
  * @returns {Bool}
  */
 export function findStateProp(target: any, key: string) {
-	const states = Reflect.getMetadata('component:states', target) || [];
-	return states.includes(key);
+	return find('component:states', target, key);
 }
 
 /**
@@ -90,8 +108,7 @@ export function findStateProp(target: any, key: string) {
  * @returns {Bool}
  */
 export function findStyleProp(target: any, key: string) {
-	const style = Reflect.getMetadata('component:style', target) || [];
-	return style.includes(key);
+	return find('component:style', target, key);
 }
 
 /**
@@ -103,6 +120,5 @@ export function findStyleProp(target: any, key: string) {
  * @returns {Bool}
  */
 export function findProps(target: any, key: string) {
-	const props = Reflect.getMetadata('component:props', target) || [];
-	return props.includes(key);
+	return find('component:props', target, key);
 }
