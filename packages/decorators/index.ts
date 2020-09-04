@@ -5,11 +5,4 @@ import { Ref } from './Ref';
 import { Watch } from './Watch';
 import { Style } from './Style';
 
-export {
-    Component,
-    Props,
-    State,
-    Ref,
-    Watch,
-    Style
-}
+export { Component, Props, State, Ref, Watch, Style };

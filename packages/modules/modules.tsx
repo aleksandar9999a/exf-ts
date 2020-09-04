@@ -14,7 +14,7 @@ const container = {
  * 
  * @return {Object}
  */
-function createComponent(Ctor: any, innerHTML?: string, bindings?: Object) {  
+function createComponent(Ctor: any, innerHTML?: string, bindings?: object) {  
 	const instance = new Ctor();  
 
 	instance.textContent = innerHTML;  
@@ -35,10 +35,10 @@ function createComponent(Ctor: any, innerHTML?: string, bindings?: Object) {
  * @return {Void}
  */
 function bootstrap(id: string, component: any) {  
-	const container = document.getElementById(id);  
+	const root = document.getElementById(id);  
 	const instance = createComponent(component);  
 
-	container?.appendChild(instance);  
+	root?.appendChild(instance);  
 } 
 
 /**
@@ -46,7 +46,7 @@ function bootstrap(id: string, component: any) {
  * 
  * @param  {Object} target
  * @param  {Class} cmp
-
+ *
  * @return {Void}
  */
 function register(target: any, cmp: any,) {	

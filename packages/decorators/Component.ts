@@ -4,83 +4,83 @@ import { representationParser, extractChanges, ExFStylize, extractStyleChanges }
 
 /**
  * Component Decorator
- * 
+ *
  * @param  {Object}
- * 
+ *
  * @return {Function}
  */
 export function Component({ selector }: { selector: string }): any {
-	return function componentDecorator(target: any) {
-		class Ctor extends HTMLElement {
-			root: ShadowRoot;
-			representation: IElementRepresentation;
-			html: HTMLElement;
-			ctorStyle!: ICtorStyle;
-			render!: Function;
-			stylize!: Function;
-			props: Props = {};
+  return function componentDecorator(target: any) {
+    class Ctor extends HTMLElement {
+      root: ShadowRoot;
+      representation: IElementRepresentation;
+      html: HTMLElement;
+      ctorStyle!: ICtorStyle;
+      render!: () => IElementRepresentation;
+      stylize!: () => IElementRepresentation;
+      props: Props = {};
 
-			constructor() {
-				super();
-				target.call(this);
-				this.root = this.attachShadow({ mode: 'closed' });
-				this.representation = this.render();
-				this.html = representationParser(this.representation);
-				
-				this.root.appendChild(this.html);
+      constructor() {
+        super();
+        target.call(this);
+        this.root = this.attachShadow({ mode: 'closed' });
+        this.representation = this.render();
+        this.html = representationParser(this.representation);
 
-				if(!! this.stylize) {
-					const styleRep = this.stylize();
-					this.ctorStyle = ExFStylize(styleRep.children);
+        this.root.appendChild(this.html);
 
-					this.ctorStyle.styles.forEach(style => {
-						this.root.appendChild(style);
-					})
-				}
-			}
+        if (!!this.stylize) {
+          const styleRep = this.stylize();
+          this.ctorStyle = ExFStylize(styleRep.children);
 
-			updateStyle() {
-				if(! this.stylize) {
-					return;
-				}
-				
-				pushWork(() => {
-					const newRep = this.stylize();
-					const { rep, commit } = extractStyleChanges(this.ctorStyle, newRep.children);
-					this.ctorStyle.content = rep;
+          this.ctorStyle.styles.forEach((style) => {
+            this.root.appendChild(style);
+          });
+        }
+      }
 
-					return commit;
-				})
-			}
+      updateStyle() {
+        if (!this.stylize) {
+          return;
+        }
 
-			update() {
-				pushWork(() => {
-					const newRep = this.render();
-					const commit = extractChanges(this.root.childNodes, this.representation, newRep);
-					this.representation = newRep;
-					return commit;
-				})
-			}
+        pushWork(() => {
+          const newRep = this.stylize();
+          const { rep, commit } = extractStyleChanges(this.ctorStyle, newRep.children);
+          this.ctorStyle.content = rep;
 
-			setProps(key: string, value: any) {
-				this.props[key] = value;
-				this.update();
+          return commit;
+        });
+      }
 
-				if(this.stylize) {
-					this.updateStyle();
-				}
-			}
+      update() {
+        pushWork(() => {
+          const newRep = this.render();
+          const commit = extractChanges(this.root.childNodes, this.representation, newRep);
+          this.representation = newRep;
+          return commit;
+        });
+      }
 
-			getProps(key: string) {
-				return this.props[key];
-			}
-		}
+      setProps(key: string, value: any) {
+        this.props[key] = value;
+        this.update();
 
-		const { constructor, ...others } = Object.getOwnPropertyDescriptors(target.prototype);
-		Object.defineProperties(Ctor.prototype, others);
-		Reflect.defineMetadata('component:selector', selector, Ctor);
-		
-		customElements.define(selector, Ctor);
-		return Ctor;
-	}
+        if (!!this.stylize) {
+          this.updateStyle();
+        }
+      }
+
+      getProps(key: string) {
+        return this.props[key];
+      }
+    }
+
+    const { constructor, ...others } = Object.getOwnPropertyDescriptors(target.prototype);
+    Object.defineProperties(Ctor.prototype, others);
+    Reflect.defineMetadata('component:selector', selector, Ctor);
+
+    customElements.define(selector, Ctor);
+    return Ctor;
+  };
 }
