@@ -1,4 +1,4 @@
-import { IWorkLoop, IElementRepresentation, Props, ICtorStyle } from '../interfaces/interfaces';
+import { IElementRepresentation, Props, ICtorStyle } from '../interfaces/interfaces';
 import { pushWork } from '../workLoop/work-loop';
 import { representationParser, extractChanges, ExFStylize, extractStyleChanges } from '../virualDomBuilder';
 

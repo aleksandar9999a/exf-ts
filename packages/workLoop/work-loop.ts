@@ -1,5 +1,3 @@
-import { IWorkLoop } from "../interfaces/interfaces";
-
 /**
  * Add requestIdleCallback support for browsers who don't support it
  * 

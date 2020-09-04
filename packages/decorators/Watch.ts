@@ -1,4 +1,5 @@
-import { defineWatch, findProps, findStateProp, findStyleProp } from './../metadata/metadata'
+import { defineWatch, findProps, findStateProp, findStyleProp } from './../metadata/metadata';
+
 /**
  * Watch Decorator
  * 

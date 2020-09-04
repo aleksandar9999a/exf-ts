@@ -10,10 +10,6 @@ export interface IUpdateHTML {
 	changes: any
 }
 
-export interface IWorkLoop {
-	pushWork: (work: Function) => void;
-}
-
 export interface IExFModule {  
 	components?: any[],  
 	modules?: IExFModule[],  

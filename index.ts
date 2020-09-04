@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
-import { Component, Props, State, Ref, Watch, Style } from "./decorators";
-import { IElementRepresentation } from "./interfaces/interfaces";
-import { ExFModule } from "./modules/modules";
+import { Component, Props, State, Ref, Watch, Style } from "./packages/decorators";
+import { IElementRepresentation } from "./packages/interfaces/interfaces";
+import { ExFModule } from "./packages/modules/modules";
 
 export {
     Component,
