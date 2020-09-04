@@ -4,6 +4,8 @@
 	"repository": "https://github.com/aleksandar9999a/ex-f.git",
 	"author": "aleksandar9999a <aleksandar9999a@gmail.com>",
 	"license": "MIT",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
 	"scripts": {
 		"build": "tsc",
 		"format": "prettier --write \"packages/**/*.ts\"",
