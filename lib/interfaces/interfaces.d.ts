@@ -25,6 +25,12 @@ export interface ICtorStyleChange {
     element: HTMLElement;
     content: string;
 }
+export interface State {
+    [key: string]: any;
+}
+export interface Styles {
+    [key: string]: any;
+}
 declare type RequestIdleCallbackHandle = any;
 declare type RequestIdleCallbackOptions = {
     timeout: number;

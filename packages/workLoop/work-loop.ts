@@ -8,16 +8,16 @@
 window.requestIdleCallback = window.requestIdleCallback || customRequestIdleCallback;
 
 function customRequestIdleCallback(handler: (obj: object) => void) {
-  const startTime = Date.now();
+    const startTime = Date.now();
 
-  return setTimeout(() => {
-    handler({
-      didTimeout: false,
-      timeRemaining: () => {
-        return Math.max(0, 50.0 - (Date.now() - startTime));
-      },
-    });
-  }, 1);
+    return setTimeout(() => {
+        handler({
+            didTimeout: false,
+            timeRemaining: () => {
+                return Math.max(0, 50.0 - (Date.now() - startTime));
+            },
+        });
+    }, 1);
 }
 
 let isWorking = false;
@@ -32,14 +32,14 @@ let result: any[] = [];
  * @return {Void}
  */
 export function pushWork(work: () => () => void) {
-  queue = queue.concat(work);
+    queue = queue.concat(work);
 
-  if (isWorking) {
-    return;
-  }
+    if (isWorking) {
+        return;
+    }
 
-  isWorking = true;
-  processWork();
+    isWorking = true;
+    processWork();
 }
 
 /**
@@ -48,22 +48,22 @@ export function pushWork(work: () => () => void) {
  * @return {Void}
  */
 function processWork() {
-  window.requestIdleCallback((deadline) => {
-    while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && queue.length > 0) {
-      const work = queue[0];
-      const part = work();
-      result = result.concat(part);
-      queue = queue.slice(1);
-    }
+    window.requestIdleCallback((deadline) => {
+        while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && queue.length > 0) {
+            const work = queue[0];
+            const part = work();
+            result = result.concat(part);
+            queue = queue.slice(1);
+        }
 
-    if (queue.length > 0) {
-      processWork();
-    }
+        if (queue.length > 0) {
+            processWork();
+        }
 
-    if (result.length > 0) {
-      commitWork();
-    }
-  });
+        if (result.length > 0) {
+            commitWork();
+        }
+    });
 }
 
 /**
@@ -72,9 +72,9 @@ function processWork() {
  * @return {Void}
  */
 function commitWork() {
-  requestAnimationFrame(() => {
-    isWorking = false;
-    result.forEach((part) => part());
-    result = [];
-  });
+    requestAnimationFrame(() => {
+        isWorking = false;
+        result.forEach((part) => part());
+        result = [];
+    });
 }

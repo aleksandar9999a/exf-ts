@@ -1,4 +1,4 @@
-import { IElementRepresentation, Props, ICtorStyle } from '../interfaces/interfaces';
+import { IElementRepresentation, Props, ICtorStyle, State, Styles } from '../interfaces/interfaces';
 import { pushWork } from '../workLoop/work-loop';
 import { representationParser, extractChanges, ExFStylize, extractStyleChanges } from '../virualDomBuilder';
 
@@ -10,77 +10,120 @@ import { representationParser, extractChanges, ExFStylize, extractStyleChanges }
  * @return {Function}
  */
 export function Component({ selector }: { selector: string }): any {
-  return function componentDecorator(target: any) {
-    class Ctor extends HTMLElement {
-      root: ShadowRoot;
-      representation: IElementRepresentation;
-      html: HTMLElement;
-      ctorStyle!: ICtorStyle;
-      render!: () => IElementRepresentation;
-      stylize!: () => IElementRepresentation;
-      props: Props = {};
+    return function componentDecorator(target: any) {
+        class Ctor extends HTMLElement {
+            private _root: ShadowRoot;
+            private _representation: IElementRepresentation;
+            private _html: HTMLElement;
+            private _ctorStyle!: ICtorStyle;
+            private _props: Props = {};
+            private _state: State = {};
+            private _styles: Styles = {};
 
-      constructor() {
-        super();
-        target.call(this);
-        this.root = this.attachShadow({ mode: 'closed' });
-        this.representation = this.render();
-        this.html = representationParser(this.representation);
+            private render!: () => IElementRepresentation;
+            private stylize!: () => IElementRepresentation;
 
-        this.root.appendChild(this.html);
+            constructor() {
+                super();
+                target.call(this);
+                this._root = this.attachShadow({ mode: 'closed' });
+                this._representation = this.render();
+                this._html = representationParser(this._representation);
 
-        if (!!this.stylize) {
-          const styleRep = this.stylize();
-          this.ctorStyle = ExFStylize(styleRep.children);
+                this._root.appendChild(this._html);
 
-          this.ctorStyle.styles.forEach((style) => {
-            this.root.appendChild(style);
-          });
+                if (!!this.stylize) {
+                    const styleRep = this.stylize();
+                    this._ctorStyle = ExFStylize(styleRep.children);
+
+                    this._ctorStyle.styles.forEach((style) => {
+                        this._root.appendChild(style);
+                    });
+                }
+            }
+
+            private updateStyle() {
+                if (!this.stylize) {
+                    return;
+                }
+
+                pushWork(() => {
+                    const newRep = this.stylize();
+                    const { rep, commit } = extractStyleChanges(this._ctorStyle, newRep.children);
+                    this._ctorStyle.content = rep;
+
+                    return commit;
+                });
+            }
+
+            private update() {
+                pushWork(() => {
+                    const newRep = this.render();
+                    const commit = extractChanges(this._root.childNodes, this._representation, newRep);
+                    this._representation = newRep;
+                    return commit;
+                });
+            }
+
+            setProps(key: string, value: any) {
+                this._props[key] = value;
+                this.update();
+
+                if (!!this.stylize) {
+                    this.updateStyle();
+                }
+            }
+
+            getProps(key: string) {
+                return this._props[key];
+            }
+
+            setState(key: string, value: any) {
+                this._state[key] = value;
+
+                if (!!this.render) {
+                    this.update();
+                }
+            }
+
+            getState(key: string) {
+                return this._state[key];
+            }
+
+            setStyle(key: string, value: any) {
+                this._styles[key] = value;
+
+                if (!!this.stylize) {
+                    this.updateStyle();
+                }
+            }
+
+            getStyle(key: string) {
+                return this._styles[key];
+            }
+
+            findProp(key: string) {
+                return this._props.hasOwnProperty(key);
+            }
+
+            findStyle(key: string) {
+                return this._styles.hasOwnProperty(key);
+            }
+
+            findState(key: string) {
+                return this._state.hasOwnProperty(key);
+            }
         }
-      }
 
-      updateStyle() {
-        if (!this.stylize) {
-          return;
-        }
+        const { constructor, ...others } = Object.getOwnPropertyDescriptors(target.prototype);
+        Object.defineProperties(Ctor.prototype, others);
 
-        pushWork(() => {
-          const newRep = this.stylize();
-          const { rep, commit } = extractStyleChanges(this.ctorStyle, newRep.children);
-          this.ctorStyle.content = rep;
-
-          return commit;
+        Object.defineProperty(Ctor.prototype, 'selector', {
+            value: selector,
+            writable: false,
         });
-      }
 
-      update() {
-        pushWork(() => {
-          const newRep = this.render();
-          const commit = extractChanges(this.root.childNodes, this.representation, newRep);
-          this.representation = newRep;
-          return commit;
-        });
-      }
-
-      setProps(key: string, value: any) {
-        this.props[key] = value;
-        this.update();
-
-        if (!!this.stylize) {
-          this.updateStyle();
-        }
-      }
-
-      getProps(key: string) {
-        return this.props[key];
-      }
-    }
-
-    const { constructor, ...others } = Object.getOwnPropertyDescriptors(target.prototype);
-    Object.defineProperties(Ctor.prototype, others);
-    Reflect.defineMetadata('component:selector', selector, Ctor);
-
-    customElements.define(selector, Ctor);
-    return Ctor;
-  };
+        customElements.define(selector, Ctor);
+        return Ctor;
+    };
 }

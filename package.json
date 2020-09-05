@@ -19,9 +19,7 @@
 		"typescript": "^3.7.4"
 	},
 	"dependencies": {
-		"@types/reflect-metadata": "^0.1.0",
 		"@webcomponents/webcomponentsjs": "^2.4.3",
-		"custom-elements-es5-adapter": "^1.0.0",
-		"reflect-metadata": "^0.1.13"
+		"custom-elements-es5-adapter": "^1.0.0"
 	}
 }

@@ -49,8 +49,8 @@ function bootstrap(id: string, component: any) {
  *
  * @return {Void}
  */
-function register(target: any, cmp: any,) {	
-	const selector = Reflect.getMetadata('component:selector', cmp);	
+function register(target: any, cmp: any) {
+	const selector = cmp.prototype.selector;	
 	
 	if (target[selector]) {	
 		throw new Error(`Component ${selector} is already registered!`);	
