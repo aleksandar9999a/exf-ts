@@ -65,16 +65,23 @@ export function Component({ selector }: { selector: string }): any {
                 });
             }
 
-            setProps(key: string, value: any) {
+            setAttribute(key: string, value: any, type?: string) {
                 this._props[key] = value;
-                this.update();
 
-                if (!!this.stylize) {
+                if (type === 'state') {
+                    this.update();
+                } else if (type === 'style' && !!this.stylize) {
                     this.updateStyle();
+                } else {
+                    this.update();
+
+                    if (!!this.stylize) {
+                        this.updateStyle();
+                    }
                 }
             }
 
-            getProps(key: string) {
+            getAttribute(key: string) {
                 return this._props[key];
             }
 
