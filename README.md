@@ -1,23 +1,20 @@
 <p align="center">
-<img 
-	src="https://lh3.googleusercontent.com/NZnlKGjulJjJMdZuCqgJW40bCuTe-NPxUKPaxOmDzcqz5PfvrS_WwSf2Tm8d14UG9xVhYanvx_xOk3qd8qtBG3c3F_4KdjA1C1kO-qfl9eW2AVWqSj_CpaXeOBQKXJppTAI0wXYFQB2qWotM_DGB5IFJflqB8rSwCXgxvcX9luyKd7o7tUO37tZX5q09vR6pxntegbzm6uhwx2SIp9F_wZ-62kPc7N5dlNn8AD7qgz5NQaLYKBdXqXVaBclJGPsXzgwfhrhK6S5xV_bFvwj97QcqFiVQdWrvQSkRNehkhXcblt8U5pfUO9_u-YDaCYRVQQUJWSTX5b0CvKHHLijMMNe8hEvV1r9gk1qX6HPQWSud31xd4wW4Zs9taKeCSNi90LgFhlAdVKc5PxNEpzlr3vHCVUG_-lYqt2vAK8mtz10QXS3YC_kIPFUEPWqhXjO5FjILIV220VtZyzWjH5qgBVzh-jpOZh1UMVMeSDab2zkt0o8j_pwkK96kCctzRgumqb0KnZ3qHelyxGbrj31LOHvsFve8JpODc3hc31fNA5aas3CgBGzZsN6SU0-xo0V7ZoDITEok8r2If9lSwKO7yeN0IYHW8mZiRWWAkEzVP2Wa5hvrYHZoDme7BAruPb4k_1MtYZT4pJ7zo6Z_v6wmSsR-mqbOvAUFw_1XPb-wdo3o3DTXc4nfaZEsdJAyAQ=s625-no?authuser=0"
-	height="200"
-/>
+	<img src="https://firebasestorage.googleapis.com/v0/b/exf-ts.appspot.com/o/logo-exf.png?alt=media&token=37da74eb-d4bc-4a4d-83a2-5b283fa8374d" height="200" />
 </p>
 
-<div align="center">
-<h1>ExF - TS</h1>
+<h1 align="center">ExF - TS</h1>
 
-<p>ExF - TS is TypeScript/JavaScript Library for building Custom Web Components. Its purpose is to refine Web Components and present a cool way for their composing.</p>
-</div>
+<p align="center">ExF - TS is TypeScript/JavaScript Library for building Custom Web Components. Its purpose is to refine Web Components and present a cool way for their composing.</p>
 
-<div align="center">
-<h2>Introduction</h2>
+<br><br>
 
-<p>
+<h2 align="center">Introduction</h2>
+
+<p align="center">
 In the next few lines I will list some of the features that ExF combines to gain his super powers.
 </p>
 
+<br><br>
 
 - [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) - This is a technology with which help I manage to combine the super powers of technologies listed below.
 
@@ -32,10 +29,10 @@ In the next few lines I will list some of the features that ExF combines to gain
 - [Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html) - When I saw decorators for first time they seemed rather strange to me. But this doesn't make them bad.
 
 - etc...
-</div>
 
-<div align="center">
-<h2>API</h2>
+<br><br>
+
+<h2 align="center">API</h2>
 
 | Decorators | Desctiption |
 | --- | --- |
@@ -44,12 +41,11 @@ In the next few lines I will list some of the features that ExF combines to gain
 | State | Create state property - change => update DOM |
 | Style | Create style property - its like state but for styles |
 | Ref | Get reference to HTML Element in current component |  
-</div>
 
-<div align="center">
-<h2>How to use it</h2>
+<br><br>
 
-<p>
+<h2 align="center">How to use it</h2>
+
+<p align="center">
 	Coming Soon
 </p>
-</div>
