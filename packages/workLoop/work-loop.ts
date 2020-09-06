@@ -31,7 +31,7 @@ let result: any[] = [];
  *
  * @return {Void}
  */
-export function pushWork(work: () => () => void) {
+export function pushWork(work: any) {
     queue = queue.concat(work);
 
     if (isWorking) {
@@ -62,6 +62,7 @@ function processWork() {
 
         if (result.length > 0) {
             commitWork();
+            isWorking = false;
         }
     });
 }

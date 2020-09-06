@@ -1,8 +1,3 @@
-/**
- * Define Custom Element
- * 
- * @param {Object}
- */
 export function CustomElement({ selector }: { selector: string }) {
     return (target: any) => {
         Object.defineProperty(target.prototype, 'selector', {

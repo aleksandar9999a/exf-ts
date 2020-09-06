@@ -1,5 +1,5 @@
 import { IElementRepresentation, ICtorStyle, Props, State, Styles } from '../interfaces/interfaces';
-import { representationParser, ExFStylize, extractStyleChanges, extractChanges } from '../virualDomBuilder';
+import { representationParser, ExFStylize, extractStyleChanges, updateView } from '../virualDomBuilder';
 import { pushWork } from '../workLoop/work-loop';
 
 export class Component extends HTMLElement {
@@ -60,12 +60,9 @@ export class Component extends HTMLElement {
             return;
         }
 
-        pushWork(() => {
-            const newRep = (this as any).render();
-            const commit = extractChanges(this._root.childNodes, this._representation, newRep);
-            this._representation = newRep;
-            return commit;
-        });
+        const newRep = (this as any).render();
+        updateView((this._root as any) as ChildNode, this._root.childNodes, [this._representation], [newRep]);
+        this._representation = newRep;
     }
 
     setAttribute(key: string, value: any, type?: string) {

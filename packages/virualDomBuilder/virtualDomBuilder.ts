@@ -1,5 +1,6 @@
-import { IElementRepresentation, IUpdateHTML } from './../interfaces/interfaces';
+import { IElementRepresentation } from './../interfaces/interfaces';
 import { events } from './events-register';
+import { pushWork } from './../workLoop/work-loop';
 
 /**
  * Parse IElementRepresentation | string to HTML Element
@@ -44,144 +45,87 @@ export function representationParser({ tag, props, children }: IElementRepresent
 }
 
 /**
- * Extract changes and return commit function
+ * Update HTML
  *
+ * @param {ChildNode} parent
  * @param {NodeListOf<ChildNode>} childNodes
- * @param {IElementRepresentation} firstRep
- * @param {IElementRepresentation} secondRep
- *
- * @returns {() => updateHTML()}
- */
-export function extractChanges(
-    childNodes: NodeListOf<ChildNode>,
-    firstRep: IElementRepresentation,
-    secondRep: IElementRepresentation,
-) {
-    return () =>
-        updateHTML({
-            parent: childNodes[0],
-            childrens: childNodes,
-            changes: compareRepresentations([firstRep], [secondRep]),
-        });
-}
-
-/**
- * Commit changes to ui
- *
- * @param {IUpdateHTML} data
- *
- * @returns {Void}
- */
-function updateHTML({ parent, childrens, changes }: IUpdateHTML) {
-    changes.forEach((change: any) => {
-        const currEl = childrens[change.elementIndex];
-        const propKeys = Object.keys(change.props || {});
-
-        propKeys.forEach((key: any) => {
-            (currEl as any)[key] = change.props[key];
-        });
-
-        if (!!change.removeElement) {
-            (currEl as HTMLElement).remove();
-        }
-
-        if (!!change.content) {
-            (currEl || parent).textContent = change.content;
-        }
-
-        if (!!change.children && !!currEl) {
-            updateHTML({
-                parent: currEl,
-                childrens: currEl.childNodes,
-                changes: change.children,
-            });
-
-            return;
-        }
-
-        if (!!change.children && !currEl) {
-            change.children.forEach((el: IElementRepresentation | string) => {
-                parent.appendChild(elementParser(el));
-            });
-        }
-    });
-}
-
-/**
- * Compare Representation and extract changes
- *
  * @param {IElementRepresentation[]} oldState
  * @param {IElementRepresentation[]} newState
  *
- * @returns {Array}
+ * @return {Void}
  */
-function compareRepresentations(oldState: IElementRepresentation[] = [], newState: IElementRepresentation[] = []) {
-    const changes: any = [];
-
+export function updateView(
+    parent: ChildNode,
+    childNodes: NodeListOf<ChildNode>,
+    oldState: IElementRepresentation[] = [],
+    newState: IElementRepresentation[] = [],
+) {
     oldState.forEach((oldEl, i) => {
         const newEl = newState[i];
-        const change: any = { elementIndex: i };
-        let hasChange = false;
 
-        if (!newEl) {
-            change.removeElement = oldEl;
-            changes.push(change);
-
-            return;
-        }
-
-        if (typeof oldEl === 'string' && typeof newEl === 'string' && oldEl !== newEl) {
-            change.content = newEl;
-            changes.push(change);
-
-            return;
-        }
-
-        if (oldEl.tag !== newEl.tag) {
-            change.element = newEl;
-            changes.push(change);
-
-            return;
-        }
-
-        const oldElProps = Object.keys(oldEl.props || {});
-
-        oldElProps.forEach((key: any) => {
-            const oldProp = (oldEl.props as any)[key];
-            const newProp = (newEl.props as any)[key];
-
-            if (oldProp !== newProp) {
-                if (!change.props) {
-                    change.props = {};
-                }
-
-                change.props[key] = newProp;
-                hasChange = true;
-            }
-        });
-
-        const children = compareRepresentations(oldEl.children, newEl.children);
-
-        if (children.length > 0) {
-            change.children = children;
-            hasChange = true;
-        }
-
-        if (hasChange) {
-            changes.push(change);
-        }
+        pushWork(basicDiff.bind(undefined, childNodes[i], oldEl, newEl));
+        updateView(childNodes[i], childNodes[i].childNodes, oldEl.children, newEl.children);
+        pushWork(lengthDiff.bind(undefined, parent, oldState, newState));
     });
+}
 
-    if (oldState.length < newState.length) {
-        const itemsLeft = newState.slice(oldState.length);
-
-        const change = {
-            elementIndex: -1,
-            children: itemsLeft,
-        };
-
-        changes.push(change);
+/**
+ * Compare state and commit small changes
+ *
+ * @param {ChildNode} child
+ * @param {IElementRepresentation} oldEl
+ * @param {IElementRepresentation} newEl
+ *
+ * @returns {() => Void[]}
+ */
+function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElementRepresentation) {
+    if (!newEl) {
+        return [() => child.remove()];
     }
 
-    return changes;
+    if (typeof oldEl === 'string' && typeof newEl === 'string' && oldEl !== newEl) {
+        return [() => (child.textContent = newEl)];
+    }
+
+    if (oldEl.tag !== newEl.tag) {
+        return [
+            () => {
+                const el = elementParser(newEl);
+                child.replaceWith(el);
+            },
+        ];
+    }
+
+    return Object.keys(oldEl.props || {}).reduce((arr: any[], key: string) => {
+        const oldProp = (oldEl.props as any)[key];
+        const newProp = (newEl.props as any)[key];
+
+        const fn = () => (child as HTMLElement).setAttribute(key, newProp);
+
+        return oldProp !== newProp ? [...arr, fn] : arr;
+    }, []);
+}
+
+/**
+ * Comapare state and commit new elements
+ *
+ * @param {ChildNode} parent
+ * @param {IElementRepresentation[]} oldState
+ * @param {IElementRepresentation[]} newState
+ *
+ * @return {() => Void}
+ */
+function lengthDiff(
+    parent: ChildNode,
+    oldState: IElementRepresentation[] = [],
+    newState: IElementRepresentation[] = [],
+) {
+    const itemsLeft = newState.slice(oldState.length);
+
+    return () => {
+        itemsLeft.forEach((item) => {
+            const el = elementParser(item);
+            parent.appendChild(el);
+        });
+    };
 }
