@@ -23,9 +23,9 @@ export function Component({ selector }: { selector: string }): any {
             private render!: () => IElementRepresentation;
             private stylize!: () => IElementRepresentation;
 
-            constructor() {
+            constructor(...arg: any) {
                 super();
-                target.call(this);
+                target.call(this, ...arg);
                 this._root = this.attachShadow({ mode: 'closed' });
                 this._representation = this.render();
                 this._html = representationParser(this._representation);
