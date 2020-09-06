@@ -45,41 +45,49 @@ export function representationParser({ tag, props, children }: IElementRepresent
 }
 
 /**
- * Update HTML
+ * Extract Changes
  *
  * @param {ChildNode} parent
- * @param {NodeListOf<ChildNode>} childNodes
  * @param {IElementRepresentation[]} oldState
  * @param {IElementRepresentation[]} newState
  *
- * @return {Void}
+ * @return {(() => Void)[]}
  */
-export function updateView(
+export function extractChanges(
     parent: ChildNode,
-    childNodes: NodeListOf<ChildNode>,
     oldState: IElementRepresentation[] = [],
     newState: IElementRepresentation[] = [],
 ) {
+    let changes: (() => void)[] = [];
+
     oldState.forEach((oldEl, i) => {
         const newEl = newState[i];
 
-        pushWork(basicDiff.bind(undefined, childNodes[i], oldEl, newEl));
-        updateView(childNodes[i], childNodes[i].childNodes, oldEl.children, newEl.children);
-        pushWork(lengthDiff.bind(undefined, parent, oldState, newState));
+        const basicChanges = basicDiff(parent.childNodes[i] || parent, oldEl, newEl);
+        const childrenChanges =
+            !!newEl && !!newEl.children
+                ? extractChanges(parent.childNodes[i] || parent, oldEl.children, newEl.children)
+                : [];
+
+        changes = [...changes, ...basicChanges, ...childrenChanges];
     });
+
+    const lengthChanges = newState.length > oldState.length ? lengthDiff(parent, oldState, newState) : [];
+
+    return [...changes, ...lengthChanges];
 }
 
 /**
- * Compare state and commit small changes
+ * Compare state and extract small changes
  *
  * @param {ChildNode} child
  * @param {IElementRepresentation} oldEl
  * @param {IElementRepresentation} newEl
  *
- * @returns {() => Void[]}
+ * @returns {(() => Void)[]}
  */
 function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElementRepresentation) {
-    if (!newEl) {
+    if (typeof oldEl !== 'string' && !newEl) {
         return [() => child.remove()];
     }
 
@@ -100,20 +108,36 @@ function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElem
         const oldProp = (oldEl.props as any)[key];
         const newProp = (newEl.props as any)[key];
 
-        const fn = () => (child as HTMLElement).setAttribute(key, newProp);
+        if (key === 'style') {
+            const styleProps = Object.keys(newProp);
 
-        return oldProp !== newProp ? [...arr, fn] : arr;
+            const changes = styleProps.reduce((props: any[], key: string) => {
+                if ((oldProp as any)[key] !== (newProp as any)[key]) {
+                    return [...props, () => ((child as any).style[key] = (newProp as any)[key])];
+                }
+
+                return props;
+            }, []);
+
+            return [...arr, ...changes];
+        }
+
+        if (oldProp !== newProp) {
+            return [...arr, () => ((child as any)[key] = newProp)];
+        }
+
+        return arr;
     }, []);
 }
 
 /**
- * Comapare state and commit new elements
+ * Comapare state length and create new elements
  *
  * @param {ChildNode} parent
  * @param {IElementRepresentation[]} oldState
  * @param {IElementRepresentation[]} newState
  *
- * @return {() => Void}
+ * @return {(() => Void)[]}
  */
 function lengthDiff(
     parent: ChildNode,
@@ -122,10 +146,12 @@ function lengthDiff(
 ) {
     const itemsLeft = newState.slice(oldState.length);
 
-    return () => {
-        itemsLeft.forEach((item) => {
-            const el = elementParser(item);
-            parent.appendChild(el);
-        });
-    };
+    return [
+        () => {
+            itemsLeft.forEach((item) => {
+                const el = elementParser(item);
+                parent.appendChild(el);
+            });
+        },
+    ];
 }
