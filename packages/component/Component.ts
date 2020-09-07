@@ -76,51 +76,15 @@ export class Component extends HTMLElement {
         } else if (type === 'style' && !!(this as any).stylize) {
             this.updateStyle();
         } else {
-            this.update();
-
             if (!!(this as any).stylize) {
                 this.updateStyle();
             }
+
+            this.update();
         }
     }
 
     getAttribute(key: string) {
         return this._props[key];
-    }
-
-    setState(key: string, value: any) {
-        this._state[key] = value;
-
-        if (!!(this as any).render) {
-            this.update();
-        }
-    }
-
-    getState(key: string) {
-        return this._state[key];
-    }
-
-    setStyle(key: string, value: any) {
-        this._styles[key] = value;
-
-        if (!!(this as any).stylize) {
-            this.updateStyle();
-        }
-    }
-
-    getStyle(key: string) {
-        return this._styles[key];
-    }
-
-    findProp(key: string) {
-        return this._props.hasOwnProperty(key);
-    }
-
-    findStyle(key: string) {
-        return this._styles.hasOwnProperty(key);
-    }
-
-    findState(key: string) {
-        return this._state.hasOwnProperty(key);
     }
 }
