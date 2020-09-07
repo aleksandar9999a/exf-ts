@@ -3,10 +3,6 @@
  *
  * @param {String} type
  *
- * @param {Any} target
- * @param {String} key
- * @param {TypedPropertyDescriptor<any>} descriptor
- *
  * @return {() => Void}
  */
 export function State(type?: string) {
