@@ -1,6 +1,5 @@
 import { IElementRepresentation } from './../interfaces/interfaces';
 import { events } from './events-register';
-import { pushWork } from './../workLoop/work-loop';
 
 /**
  * Parse IElementRepresentation | string to HTML Element
