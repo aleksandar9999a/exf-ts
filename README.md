@@ -41,7 +41,7 @@ In the next few lines I will list some of the features that ExF combines to gain
 | Decorators | Desctiption |
 | --- | --- |
 | Custom Element | Indicate class as ExF Component |
-| Props | Creates a property that serves as input for data |
+| Prop | Creates a property that serves as input for data |
 | State | Create state property - change => update DOM |
 | Ref | Get reference to HTML Element in current component |  
 
@@ -115,18 +115,18 @@ For now, our component consists of a few very simple ingredients:
 
 <br />
 
-<h3>Props</h3>
+<h3>Prop</h3>
 
 ```javascript
-	import ExF, { CustomElement, Component, Props } from 'exf-ts';
+	import ExF, { CustomElement, Component, Prop } from 'exf-ts';
 
 	@CustomElement({
 		selector: 'exf-app'
 	})
 	class App extends Component {
-		@Props() top: number = 0;
-		@Props('style') bg: string = '#fff';
-		@Props('state') name: string = 'ExF';
+		@Prop() top: number = 0;
+		@Prop('style') bg: string = '#fff';
+		@Prop('state') name: string = 'ExF';
 
 		stylize() {
 			return (
@@ -163,13 +163,13 @@ For now, our component consists of a few very simple ingredients:
 ```
 
 <p>
-Тhe example shows us what is Props and how we can use it. In short - these are attributes through which we can import data into our components. They also trigger an DOM and Style updates.
+Тhe example shows us what is Prop and how we can use it. In short - these are attributes through which we can import data into our components. They also trigger DOM and Style updates.
 
 If you've noticed we have three different Props. The difference between them is in the option they have accepted. 
 
-- @Props() - Trigger style and html update
-- @Props('style') - Trigger only style update
-- @Props('state') - Trigger only html update
+- @Prop() - Trigger Style and DOM update
+- @Prop('style') - Trigger only Style update
+- @Prop('state') - Trigger only DOM update
 </p>
 
 <br />
@@ -218,11 +218,11 @@ If you've noticed we have three different Props. The difference between them is 
 ```
 
 <p>
-Тhe example shows us what State is and how we can use it. It is like Props, just they are external state.
+Тhe example shows us what State is and how we can use it. It is like Prop, just they are external state.
 
-- @State() - Trigger style and html update
-- @State('style') - Trigger only style update
-- @State('state') - Trigger only html update
+- @State() - Trigger Style and DOM update
+- @State('style') - Trigger only Style update
+- @State('state') - Trigger only DOM update
 </p>
 
 <br />
@@ -231,7 +231,7 @@ If you've noticed we have three different Props. The difference between them is 
 
 
 ```javascript
-	import ExF, { CustomElement, Component, Props } from 'exf-ts';
+	import ExF, { CustomElement, Component, Prop } from 'exf-ts';
 
 	@CustomElement({
 		selector: 'exf-app'
@@ -267,7 +267,7 @@ If you've noticed we have three different Props. The difference between them is 
 
 <br />
 
-<h3>The End</h3>
+<h3>The End of Basics</h3>
 
 <p>Everything is ok so far, but you may still be wondering how the hell I can run this component.</p>
 
