@@ -1,10 +1,10 @@
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
-import { CustomElement, Props, State, Ref } from './decorators';
+import { CustomElement, Prop, State, Ref } from './decorators';
 import { IElementRepresentation } from './interfaces/interfaces';
 import { ExFModule } from './modules/modules';
 import { Component } from './component/Component';
 
-export { CustomElement, Component, Props, State, Ref, ExFModule };
+export { CustomElement, Component, Prop, State, Ref, ExFModule };
 
 /**
  * ExF - Default JSX Engine

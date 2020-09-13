@@ -1,12 +1,12 @@
 /**
- * Props Decorator
+ * Prop Decorator
  *
  * @param  {Any} target
  * @param  {String} key
  *
  * @return {Void}
  */
-export function Props(type?: string) {
+export function Prop(type?: string) {
     return (target: any, key: string) => {
         Object.defineProperty(target, key, {
             set(newValue) {

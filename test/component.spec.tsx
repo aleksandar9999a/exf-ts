@@ -1,4 +1,4 @@
-import ExF, { Component, CustomElement, Props, State } from './../packages/index';
+import ExF, { Component, CustomElement, Prop, State } from './../packages/index';
 
 describe('ExF tests', () => {
 	describe('Custom Element', () => {
@@ -35,7 +35,7 @@ describe('ExF tests', () => {
 				selector: 'exf-test3'
 			})
 			class Test extends Component {
-				@Props() test: string = 'test';
+				@Prop() test: string = 'test';
 
 				render() {
 					return <div></div>
@@ -69,7 +69,7 @@ describe('ExF tests', () => {
 				selector: 'exf-test5'
 			})
 			class Test extends Component {
-				@Props() test: string = 'test';
+				@Prop() test: string = 'test';
 
 				render() {
 					return <div>{this.test}</div>
