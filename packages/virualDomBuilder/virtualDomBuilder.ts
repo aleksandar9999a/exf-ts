@@ -8,7 +8,7 @@ import { events } from './events-register';
  *
  * @returns {HTMLElement | Text}
  */
-function elementParser(child: IElementRepresentation | string) {
+export function elementParser(child: IElementRepresentation | string) {
     return typeof child === 'string' ? document.createTextNode(child) : representationParser(child);
 }
 

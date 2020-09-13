@@ -1,4 +1,4 @@
-import { createStyleContent } from './virtualStyleBuilder';
+import { createStyleContent } from './../packages/virualDomBuilder/virtualStyleBuilder';
 
 describe('Virtual Style Bilder - createStyleContent', () => {
 	test('Expect to return empty array', () => {
