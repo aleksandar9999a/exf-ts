@@ -1,4 +1,6 @@
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
+import '@webcomponents/custom-elements';
+
 import { CustomElement, Prop, State, Ref } from './decorators';
 import { IElementRepresentation } from './interfaces/interfaces';
 import { ExFModule } from './modules/modules';
