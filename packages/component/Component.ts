@@ -12,7 +12,6 @@ export class Component extends HTMLElement {
 	};
 	private _props: Props = {};
 	private _state: State = {};
-	private _styles: Styles = {};
 
 	connectedCallback() {
 		this._root = this.attachShadow({ mode: 'closed' });
