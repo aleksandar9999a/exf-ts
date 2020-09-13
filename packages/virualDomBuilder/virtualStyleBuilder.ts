@@ -49,9 +49,10 @@ export function createStyleContent(children: (object | string)[]) {
 			arr[arr.length - 1] += ' }';
 			const indexOfClose = arr[arr.length - 1].indexOf('}');
 
-			arr = indexOfClose - indexOfOpen < 3
-				? [...arr.slice(0, arr.length - 1), ...concatedStyles]
-				: [...arr, ...concatedStyles];
+			arr =
+				indexOfClose - indexOfOpen < 3
+					? [...arr.slice(0, arr.length - 1), ...concatedStyles]
+					: [...arr, ...concatedStyles];
 		}
 
 		return arr;

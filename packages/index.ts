@@ -16,11 +16,11 @@ export { CustomElement, Component, Prop, State, Ref, ExFModule };
  * @returns {Object}
  */
 export default function ExF(tag: string, props: any, ...children: (string | IElementRepresentation)[]) {
-    children = (children as any).flat().filter((child: any) => child !== null) as (string | IElementRepresentation)[];
+	children = (children as any).flat().filter((child: any) => child !== null) as (string | IElementRepresentation)[];
 
-    return {
-        tag,
-        props: props || {},
-        children,
-    };
+	return {
+		tag,
+		props: props || {},
+		children,
+	};
 }

@@ -9,7 +9,7 @@ import { events } from './events-register';
  * @returns {HTMLElement | Text}
  */
 export function elementParser(child: IElementRepresentation | string) {
-    return typeof child === 'string' ? document.createTextNode(child) : representationParser(child);
+	return typeof child === 'string' ? document.createTextNode(child) : representationParser(child);
 }
 
 /**
@@ -20,27 +20,27 @@ export function elementParser(child: IElementRepresentation | string) {
  * @return {HTMLElement}
  */
 export function representationParser({ tag, props, children }: IElementRepresentation) {
-    const el = document.createElement(tag);
+	const el = document.createElement(tag);
 
-    Object.keys(props || {}).forEach((key) => {
-        if (typeof (props as any)[key] === 'function' && !!events[key]) {
-            el.addEventListener(events[key], (props as any)[key]);
-        } else if (key === 'style') {
-            const styleProps = Object.keys((props as any)[key]);
+	Object.keys(props || {}).forEach((key) => {
+		if (typeof (props as any)[key] === 'function' && !!events[key]) {
+			el.addEventListener(events[key], (props as any)[key]);
+		} else if (key === 'style') {
+			const styleProps = Object.keys((props as any)[key]);
 
-            styleProps.forEach((style) => {
-                (el as any).style[style] = (props as any)[key][style];
-            });
-        } else {
-            (el as any)[key] = (props as any)[key];
-        }
-    });
+			styleProps.forEach((style) => {
+				(el as any).style[style] = (props as any)[key][style];
+			});
+		} else {
+			(el as any)[key] = (props as any)[key];
+		}
+	});
 
-    children.map(elementParser).forEach((child: any) => {
-        el.appendChild(child);
-    });
+	children.map(elementParser).forEach((child: any) => {
+		el.appendChild(child);
+	});
 
-    return el;
+	return el;
 }
 
 /**
@@ -53,27 +53,27 @@ export function representationParser({ tag, props, children }: IElementRepresent
  * @return {(() => Void)[]}
  */
 export function extractChanges(
-    parent: ChildNode,
-    oldState: IElementRepresentation[] = [],
-    newState: IElementRepresentation[] = [],
+	parent: ChildNode,
+	oldState: IElementRepresentation[] = [],
+	newState: IElementRepresentation[] = [],
 ) {
-    let changes: (() => void)[] = [];
+	let changes: (() => void)[] = [];
 
-    oldState.forEach((oldEl, i) => {
-        const newEl = newState[i];
+	oldState.forEach((oldEl, i) => {
+		const newEl = newState[i];
 
-        const basicChanges = basicDiff(parent.childNodes[i] || parent, oldEl, newEl);
-        const childrenChanges =
-            !!newEl && !!newEl.children
-                ? extractChanges(parent.childNodes[i] || parent, oldEl.children, newEl.children)
-                : [];
+		const basicChanges = basicDiff(parent.childNodes[i] || parent, oldEl, newEl);
+		const childrenChanges =
+			!!newEl && !!newEl.children
+				? extractChanges(parent.childNodes[i] || parent, oldEl.children, newEl.children)
+				: [];
 
-        changes = [...changes, ...basicChanges, ...childrenChanges];
-    });
+		changes = [...changes, ...basicChanges, ...childrenChanges];
+	});
 
-    const lengthChanges = newState.length > oldState.length ? lengthDiff(parent, oldState, newState) : [];
+	const lengthChanges = newState.length > oldState.length ? lengthDiff(parent, oldState, newState) : [];
 
-    return [...changes, ...lengthChanges];
+	return [...changes, ...lengthChanges];
 }
 
 /**
@@ -86,47 +86,47 @@ export function extractChanges(
  * @returns {(() => Void)[]}
  */
 function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElementRepresentation) {
-    if (typeof oldEl !== 'string' && !newEl) {
-        return [() => child.remove()];
-    }
+	if (typeof oldEl !== 'string' && !newEl) {
+		return [() => child.remove()];
+	}
 
-    if (typeof oldEl === 'string' && typeof newEl === 'string' && oldEl !== newEl) {
-        return [() => (child.textContent = newEl)];
-    }
+	if (typeof oldEl === 'string' && typeof newEl === 'string' && oldEl !== newEl) {
+		return [() => (child.textContent = newEl)];
+	}
 
-    if (oldEl.tag !== newEl.tag) {
-        return [
-            () => {
-                const el = elementParser(newEl);
-                child.replaceWith(el);
-            },
-        ];
-    }
+	if (oldEl.tag !== newEl.tag) {
+		return [
+			() => {
+				const el = elementParser(newEl);
+				child.replaceWith(el);
+			},
+		];
+	}
 
-    return Object.keys(oldEl.props || {}).reduce((arr: any[], key: string) => {
-        const oldProp = (oldEl.props as any)[key];
-        const newProp = (newEl.props as any)[key];
+	return Object.keys(oldEl.props || {}).reduce((arr: any[], key: string) => {
+		const oldProp = (oldEl.props as any)[key];
+		const newProp = (newEl.props as any)[key];
 
-        if (key === 'style') {
-            const styleProps = Object.keys(newProp);
+		if (key === 'style') {
+			const styleProps = Object.keys(newProp);
 
-            const changes = styleProps.reduce((props: any[], key: string) => {
-                if ((oldProp as any)[key] !== (newProp as any)[key]) {
-                    return [...props, () => ((child as any).style[key] = (newProp as any)[key])];
-                }
+			const changes = styleProps.reduce((props: any[], key: string) => {
+				if ((oldProp as any)[key] !== (newProp as any)[key]) {
+					return [...props, () => ((child as any).style[key] = (newProp as any)[key])];
+				}
 
-                return props;
-            }, []);
+				return props;
+			}, []);
 
-            return [...arr, ...changes];
-        }
+			return [...arr, ...changes];
+		}
 
-        if (oldProp !== newProp) {
-            return [...arr, () => ((child as any)[key] = newProp)];
-        }
+		if (oldProp !== newProp) {
+			return [...arr, () => ((child as any)[key] = newProp)];
+		}
 
-        return arr;
-    }, []);
+		return arr;
+	}, []);
 }
 
 /**
@@ -139,18 +139,18 @@ function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElem
  * @return {(() => Void)[]}
  */
 function lengthDiff(
-    parent: ChildNode,
-    oldState: IElementRepresentation[] = [],
-    newState: IElementRepresentation[] = [],
+	parent: ChildNode,
+	oldState: IElementRepresentation[] = [],
+	newState: IElementRepresentation[] = [],
 ) {
-    const itemsLeft = newState.slice(oldState.length);
+	const itemsLeft = newState.slice(oldState.length);
 
-    return [
-        () => {
-            itemsLeft.forEach((item) => {
-                const el = elementParser(item);
-                parent.appendChild(el);
-            });
-        },
-    ];
+	return [
+		() => {
+			itemsLeft.forEach((item) => {
+				const el = elementParser(item);
+				parent.appendChild(el);
+			});
+		},
+	];
 }
