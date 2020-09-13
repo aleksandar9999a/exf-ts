@@ -1,4 +1,4 @@
-import { IElementRepresentation, ICtorStyle, Props, State, Styles } from '../interfaces/interfaces';
+import { IElementRepresentation, ICtorStyle, Props, State } from '../interfaces/interfaces';
 import { representationParser, ExFStylize, extractStyleChanges, extractChanges } from '../virualDomBuilder';
 import { pushWork } from '../workLoop/work-loop';
 

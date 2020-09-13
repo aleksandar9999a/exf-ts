@@ -4,12 +4,6 @@ export interface IElementRepresentation {
     children: IElementRepresentation[];
 }
 
-export interface IUpdateHTML {
-    parent: ChildNode;
-    childrens: NodeListOf<ChildNode>;
-    changes: any;
-}
-
 export interface IExFModule {
     components?: any[];
     modules?: IExFModule[];
@@ -32,10 +26,6 @@ export interface ICtorStyleChange {
 }
 
 export interface State {
-    [key: string]: any;
-}
-
-export interface Styles {
     [key: string]: any;
 }
 
