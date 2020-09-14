@@ -9,7 +9,7 @@ import { events } from './events-register';
  * @returns {HTMLElement | Text}
  */
 export function elementParser(child: IElementRepresentation | string) {
-	return typeof child === 'string' ? document.createTextNode(child) : representationParser(child);
+	return typeof child === 'object' ? representationParser(child) : document.createTextNode(child);
 }
 
 /**
@@ -86,11 +86,11 @@ export function extractChanges(
  * @returns {(() => Void)[]}
  */
 function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElementRepresentation) {
-	if (typeof oldEl !== 'string' && !newEl) {
+	if (newEl === undefined) {
 		return [() => child.remove()];
 	}
 
-	if (typeof oldEl === 'string' && typeof newEl === 'string' && oldEl !== newEl) {
+	if (typeof oldEl != 'object' && typeof newEl != 'object' && oldEl !== newEl) {
 		return [() => (child.textContent = newEl)];
 	}
 
