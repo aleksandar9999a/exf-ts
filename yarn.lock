@@ -594,6 +594,16 @@
   dependencies:
     "@types/yargs-parser" "*"
 
+"@webcomponents/custom-elements@^1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@webcomponents/custom-elements/-/custom-elements-1.4.2.tgz#a6fe80325c2b09e88e988c712144bc667c565499"
+  integrity sha512-bLw2XH9+2NBwmn7BI6WA2oIo2eOfBpl+GjAqkF/qnkZ8kq3HY5tKYTxtKowWALAferTp3wKD8W6FSn5OyK+rtQ==
+
+"@webcomponents/shadydom@^1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@webcomponents/shadydom/-/shadydom-1.7.4.tgz#1250d4078425058d015b2a85063dff482841d292"
+  integrity sha512-ZnmHcG0YPyZtwG17dLoSyBhVZUMwowgEdrraOFmftNTppCdYiKQfoQkFp3f4al2Kc0HKOJtG96maCBGgce6HIg==
+
 "@webcomponents/webcomponentsjs@^2.4.3":
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/@webcomponents/webcomponentsjs/-/webcomponentsjs-2.4.3.tgz#384f4f6d54563ba465fb4df21fe89e78a76fc530"
