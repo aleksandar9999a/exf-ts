@@ -53,11 +53,18 @@ In the next few lines I will list some of the features that ExF combines to gain
 
 <br />
 
-<p>It is easy. You just need to have configured project, preferably with yarn, TypeScript and Webpack, after that you just run:</p>
+<p>Just clone this repository:</p>
+
+https://github.com/aleksandar9999a/exf-template
+
+<p>And run:</p>
 
 ```bash
-	yarn add exf-ts
+	yarn install
+	yarn start
 ```
+
+<p>This will create webpack server, after this write what you want in src folder</p>
 
 <br/><br/>
 
