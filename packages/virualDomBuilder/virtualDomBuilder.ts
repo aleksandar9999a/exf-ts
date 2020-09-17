@@ -36,9 +36,13 @@ export function representationParser({ tag, props, children }: IElementRepresent
 		}
 	});
 
-	children.map(elementParser).forEach((child: any) => {
-		el.appendChild(child);
-	});
+    if(tag.includes('-')) {
+        (el as any).childs = children;
+    } else {
+        children.map(elementParser).forEach((child: any) => {
+            el.appendChild(child);
+        });
+    }
 
 	return el;
 }
