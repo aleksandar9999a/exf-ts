@@ -31,8 +31,10 @@ export function representationParser({ tag, props, children }: IElementRepresent
 			styleProps.forEach((style) => {
 				(el as any).style[style] = (props as any)[key][style];
 			});
+		} else if (key === 'className') {
+			el[key] = (props as any)[key];
 		} else {
-			(el as any)[key] = (props as any)[key];
+			el.setAttribute(key, (props as any)[key]);
 		}
 	});
 
@@ -107,17 +109,13 @@ function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElem
 		];
 	}
 
-	if (
-		oldEl.props
-		&& newEl.props
-		&& (oldEl as any).props.id !== (newEl as any).props.id
-	) {
+	if (oldEl.props && newEl.props && (oldEl as any).props.id !== (newEl as any).props.id) {
 		return [
 			() => {
 				const el = elementParser(newEl);
 				child.replaceWith(el);
-			}
-		]
+			},
+		];
 	}
 
 	return Object.keys(oldEl.props || {}).reduce((arr: any[], key: string) => {
