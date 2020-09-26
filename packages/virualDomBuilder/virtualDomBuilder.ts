@@ -65,8 +65,9 @@ export function extractChanges(
 
 	oldState.forEach((oldEl, i) => {
 		const newEl = newState[i];
+		const nextEl = newState[i + 1];
 
-		const basicChanges = basicDiff(parent.childNodes[i] || parent, oldEl, newEl);
+		const basicChanges = basicDiff(parent.childNodes[i] || parent, oldEl, newEl, nextEl);
 		const childrenChanges =
 			!!newEl && !!newEl.children
 				? extractChanges(parent.childNodes[i] || parent, oldEl.children, newEl.children)
@@ -86,10 +87,11 @@ export function extractChanges(
  * @param {ChildNode} child
  * @param {IElementRepresentation} oldEl
  * @param {IElementRepresentation} newEl
+ * @param {IElementRepresentation} nextEl
  *
  * @returns {(() => Void)[]}
  */
-function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElementRepresentation) {
+function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElementRepresentation, nextEl: IElementRepresentation) {
 	if (newEl === undefined) {
 		return [() => child.remove()];
 	}
@@ -107,13 +109,23 @@ function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElem
 		];
 	}
 
-	if((oldEl.props && newEl.props) && (oldEl as any).props.id !== (newEl as any).props.id) {
-		return [
-			() => {
-				const el = elementParser(newEl);
-				child.replaceWith(el);
-			},
-		];
+	if (
+		oldEl.props
+		&& newEl.props
+		&& (oldEl as any).props.id !== (newEl as any).props.id
+	) {
+		return !!nextEl && (newEl as any).props.id !== (nextEl as any).props.id
+			? [
+				() => {
+					const el = elementParser(newEl);
+					child.replaceWith(el);
+				}
+			]
+			: [
+				() => {
+					child.remove();
+				}
+			]
 	}
 
 	return Object.keys(oldEl.props || {}).reduce((arr: any[], key: string) => {
