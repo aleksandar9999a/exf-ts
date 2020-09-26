@@ -107,6 +107,15 @@ function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElem
 		];
 	}
 
+	if((oldEl.props && newEl.props) && (oldEl as any).props.id !== (newEl as any).props.id) {
+		return [
+			() => {
+				const el = elementParser(newEl);
+				child.replaceWith(el);
+			},
+		];
+	}
+
 	return Object.keys(oldEl.props || {}).reduce((arr: any[], key: string) => {
 		const oldProp = (oldEl.props as any)[key];
 		const newProp = (newEl.props as any)[key];
