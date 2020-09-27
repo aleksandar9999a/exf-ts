@@ -23,7 +23,7 @@ export function representationParser({ tag, props, children }: IElementRepresent
 	const el = document.createElement(tag);
 
 	Object.keys(props || {}).forEach((key) => {
-		if (typeof (props as any)[key] === 'function' && !!events[key]) {
+		if (!tag.includes('-') && typeof (props as any)[key] === 'function' && !!events[key]) {
 			el.addEventListener(events[key], (props as any)[key]);
 		} else if (key === 'style') {
 			const styleProps = Object.keys((props as any)[key]);
