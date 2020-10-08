@@ -6,6 +6,17 @@ const container = {
 }
 
 /**
+ * Check is element exist in container
+ * 
+ * @param {String} selector 
+ * 
+ * @return {Boolean}
+ */
+export function isExistElement(selector: string) {
+	return !!(container as any).components[selector];
+}
+
+/**
  * Create Component
  * 
  * @param  {Class} Ctor

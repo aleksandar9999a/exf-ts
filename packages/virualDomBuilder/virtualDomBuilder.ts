@@ -1,5 +1,6 @@
 import { IElementRepresentation } from './../interfaces/interfaces';
 import { events } from './events-register';
+import { isExistElement } from './../modules/modules';
 
 /**
  * Parse IElementRepresentation | string to HTML Element
@@ -22,13 +23,13 @@ export function elementParser(child: IElementRepresentation | string) {
 export function representationParser({ tag, props, children }: IElementRepresentation) {
 	const el = document.createElement(tag);
 
+	const isRegisteredComponent = isExistElement(tag);
+
 	Object.keys(props || {}).forEach((key) => {
-		if (!tag.includes('-') && typeof (props as any)[key] === 'function' && !!events[key]) {
+		if (!isRegisteredComponent && typeof (props as any)[key] === 'function' && !!events[key]) {
 			el.addEventListener(events[key], (props as any)[key]);
 		} else if (key === 'style') {
-			const styleProps = Object.keys((props as any)[key]);
-
-			styleProps.forEach((style) => {
+			Object.keys((props as any)[key]).forEach((style) => {
 				(el as any).style[style] = (props as any)[key][style];
 			});
 		} else if (key === 'className') {
@@ -38,7 +39,7 @@ export function representationParser({ tag, props, children }: IElementRepresent
 		}
 	});
 
-	if (tag.includes('-')) {
+	if (isRegisteredComponent) {
 		(el as any).childs = children;
 	} else {
 		children.map(elementParser).forEach((child: any) => {
