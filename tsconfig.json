@@ -3,6 +3,7 @@
 		"target": "ES5",
 		"module": "esnext",
 		"outDir": "./lib",
+		"allowJs": true,
 		"lib": [
 			"esnext",
 			"dom"
