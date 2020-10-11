@@ -29,6 +29,20 @@ export function createStyleContent(children: (object | string)[]) {
 	const allStyles = children.reduce((arr: any, child) => {
 		if (typeof child === 'string') {
 			arr.push(`${(child as string).trim()} {`);
+		} else if (arr[arr.length - 1].includes('@media')) {
+			Object.keys(child).forEach((key) => {
+				createStyleContent([key, (child as any)[key]]).forEach((s: string) => {
+					arr[arr.length - 1] += s;
+				})
+			});
+
+			arr[arr.length - 1] += ' }';
+			const indexOfOpen = arr[arr.length - 1].indexOf('{');
+			const indexOfClose = arr[arr.length - 1].indexOf('}');
+
+			if (indexOfClose - indexOfOpen < 3) {
+				arr = arr.slice(0, arr.length - 1);
+			}
 		} else {
 			let lastEl = arr[arr.length - 1] as string;
 
@@ -50,8 +64,8 @@ export function createStyleContent(children: (object | string)[]) {
 			const indexOfClose = arr[arr.length - 1].indexOf('}');
 
 			arr = indexOfClose - indexOfOpen < 3
-					? [...arr.slice(0, arr.length - 1), ...concatedStyles]
-					: [...arr, ...concatedStyles];
+				? [...arr.slice(0, arr.length - 1), ...concatedStyles]
+				: [...arr, ...concatedStyles];
 		}
 
 		return arr;
