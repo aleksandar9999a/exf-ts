@@ -29,25 +29,9 @@ In the next few lines I will list some of the features that ExF combines to gain
 - [Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html) - When I saw decorators for first time they seemed rather strange to me. But this doesn't make them bad.
 
 - etc...
+=
 
-<br />
-
-<h2 align="center">API</h2>
-
-<br />
-
-<div align="center">
-
-| Decorators | Desctiption |
-| --- | --- |
-| Custom Element | Indicate class as ExF Component |
-| Prop | Creates a property that serves as input for data |
-| State | Create state property - change => update DOM |
-| Ref | Get reference to HTML Element in current component |  
-
-</div>
-
-<br><br>
+<br /><br />
 
 <h2 align="center">How to install ExF</h2>
 
@@ -67,6 +51,26 @@ https://github.com/aleksandar9999a/exf-template
 <p>This will create webpack server, after this write what you want in src folder</p>
 
 <br/><br/>
+
+<h2 align="center">API</h2>
+
+<br />
+
+<div align="center">
+
+| Name | Type | Description |
+| --- | --- | --- |
+| Custom Element | Decorator | Indicate class as ExF Component |
+| Prop | Decorator | Creates a property that serves as input for data |
+| State | Decorator | Create state property - change => update DOM |
+| Ref | Decorator | Get reference to HTML Element in current component |
+| onCreate | Method | This method is invoked each time the custom element is appended into a document-connected element |
+| onDestroy | Method | Invoked each time the custom element is disconnected from the document's DOM |
+| adoptedCallback | Method | Invoked each time the custom element is moved to a new document |
+
+</div>
+
+<br /><br />
 
 <h2 align="center">Documentation</h2>
 
@@ -330,18 +334,6 @@ If you've noticed we have three different Props. The difference between them is 
 
 <br />
 
-<div align="center">
-
-| Hook | Desctiption |
-| --- | --- |
-| onCreate | This method is invoked each time the custom element is appended into a document-connected element |
-| onDestroy | Invoked each time the custom element is disconnected from the document's DOM |
-| adoptedCallback | Invoked each time the custom element is moved to a new document |
-
-</div>
-
-<br /><br />
-
 ```javascript
 	import ExF, { CustomElement, Component } from 'exf-ts';
 	import store from 'somewhere';
@@ -377,6 +369,8 @@ If you've noticed we have three different Props. The difference between them is 
 <h2 align="center">The End</h2>
 
 <p align="center">Everything is ok so far, but you may still be wondering how the hell I can run this component without our workflow.</p>
+
+<br />
 
 <p>It is simple: </p>
 
