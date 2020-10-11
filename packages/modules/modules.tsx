@@ -17,27 +17,6 @@ export function isExistElement(selector: string) {
 }
 
 /**
- * Create Component
- * 
- * @param  {Class} Ctor
- * @param  {String} innerHTML
- * @param  {Object} bindings
- * 
- * @return {Object}
- */
-function createComponent(Ctor: any, innerHTML?: string, bindings?: object) {  
-	const instance = new Ctor();  
-
-	instance.textContent = innerHTML;  
-
-	Object.entries(bindings || {}).forEach(([key, value]) => {  
-		instance[key] = value;  
-	});  
-
-	return instance;  
-} 
-
-/**
  * Bootstrap
  * 
  * @param  {String} id
@@ -45,9 +24,9 @@ function createComponent(Ctor: any, innerHTML?: string, bindings?: object) {
  * 
  * @return {Void}
  */
-function bootstrap(id: string, component: any) {  
+function bootstrap(id: string, Ctor: any) {  
 	const root = document.getElementById(id);  
-	const instance = createComponent(component);  
+	const instance = new Ctor();  
 
 	root?.appendChild(instance);  
 } 

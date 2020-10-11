@@ -42,8 +42,9 @@ export function representationParser({ tag, props, children }: IElementRepresent
 	if (isRegisteredComponent) {
 		(el as any).childs = children;
 	} else {
-		children.map(elementParser).forEach((child: any) => {
-			el.appendChild(child);
+		children.forEach((child: any) => {
+			const parsedChild = elementParser(child);
+			el.appendChild(parsedChild);
 		});
 	}
 
@@ -70,10 +71,9 @@ export function extractChanges(
 		const newEl = newState[i];
 
 		const basicChanges = basicDiff(parent.childNodes[i] || parent, oldEl, newEl);
-		const childrenChanges =
-			!!newEl && !!newEl.children
-				? extractChanges(parent.childNodes[i] || parent, oldEl.children, newEl.children)
-				: [];
+		const childrenChanges = !!newEl && !!newEl.children
+			? extractChanges(parent.childNodes[i] || parent, oldEl.children, newEl.children)
+			: [];
 
 		changes = [...changes, ...basicChanges, ...childrenChanges];
 	});
