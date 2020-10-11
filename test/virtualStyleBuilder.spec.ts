@@ -50,4 +50,11 @@ describe('Virtual Style Bilder - createStyleContent', () => {
 
 		expect(res).toEqual(expected);
 	})
+
+	test('Expect fn([ "@keyframes ring", { "0%": { transform: "rotate(0deg)" }, "100%": { transform: "rotate(360deg)" } }]) to be ["@keyframes ring {0% { transform: rotate(0deg); }100% { transform: rotate(360deg); } }"]', () => {
+		const res = createStyleContent([ "@keyframes ring", { "0%": { transform: "rotate(0deg)" }, "100%": { transform: "rotate(360deg)" } }]);
+		const expected = ['@keyframes ring {0% { transform: rotate(0deg); }100% { transform: rotate(360deg); } }'];
+
+		expect(res).toEqual(expected);
+	})
 })

@@ -29,7 +29,7 @@ export function createStyleContent(children: (object | string)[]) {
 	const allStyles = children.reduce((arr: any, child) => {
 		if (typeof child === 'string') {
 			arr.push(`${(child as string).trim()} {`);
-		} else if (arr[arr.length - 1].includes('@media')) {
+		} else if (arr[arr.length - 1].includes('@media') || arr[arr.length - 1].includes('@keyframes')) {
 			Object.keys(child).forEach((key) => {
 				createStyleContent([key, (child as any)[key]]).forEach((s: string) => {
 					arr[arr.length - 1] += s;
