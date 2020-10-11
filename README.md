@@ -238,7 +238,7 @@ If you've noticed we have three different Props. The difference between them is 
 
 
 ```javascript
-	import ExF, { CustomElement, Component, Prop } from 'exf-ts';
+	import ExF, { CustomElement, Component, Ref } from 'exf-ts';
 
 	@CustomElement({
 		selector: 'exf-app'
@@ -274,9 +274,109 @@ If you've noticed we have three different Props. The difference between them is 
 
 <br />
 
-<h3>The End of Basics</h3>
+<h3>@Media and @Keyframes</h3>
 
-<p>Everything is ok so far, but you may still be wondering how the hell I can run this component.</p>
+<br />
+
+<p>Now we can use similar syntax for @media and @keyframes</p>
+
+```javascript
+	import ExF, { CustomElement, Component } from 'exf-ts';
+
+	@CustomElement({
+		selector: 'exf-app'
+	})
+	class App extends Component {
+		stylize() {
+			return (
+				<style>
+					@media screen and (max-width: 1300px) {
+						{
+							'.app': {
+								'height': '300px',
+								'width': '380px',
+							}
+						}
+					}
+
+					@keyframes ring {
+						{
+							'0%': { 
+								'transform': 'rotate(0deg)'
+							},
+
+							'100%': { 
+								'transform': 'rotate(360deg)'
+							}
+						}
+					}
+				</style>
+			)
+		}
+
+		render() {
+			return (
+				<div id="app" className="app">
+					App
+				</div>
+			)
+		}
+	}
+```
+
+<br /><br />
+
+<h2 align="center">Lifecycle Callbacks</h2>
+
+<br />
+
+<div align="center">
+
+| Hook | Desctiption |
+| --- | --- |
+| onCreate | This method is invoked each time the custom element is appended into a document-connected element |
+| onDestroy | Invoked each time the custom element is disconnected from the document's DOM |
+| adoptedCallback | Invoked each time the custom element is moved to a new document |
+
+</div>
+
+<br /><br />
+
+```javascript
+	import ExF, { CustomElement, Component } from 'exf-ts';
+	import store from 'somewhere';
+
+	@CustomElement({
+		selector: 'exf-app'
+	})
+	class App extends Component {
+		@State('state') isAuth: boolean = false;
+
+		onCreate() {
+			store.subscribe(isAuth => {
+				this.isAuth = isAuth;
+			})
+		}
+
+		onDestroy() {
+			store.unsubscribe();
+		}
+
+		render() {
+			return (
+				<div id="app" className="app">
+					App
+				</div>
+			)
+		}
+	}
+```
+
+<br /><br />
+
+<h2 align="center">The End</h2>
+
+<p align="center">Everything is ok so far, but you may still be wondering how the hell I can run this component without our workflow.</p>
 
 <p>It is simple: </p>
 
@@ -301,11 +401,5 @@ Or:
 ```
 
 <br /><br />
-
-<h2 align="center">Deep Dive</h2>
-
-<p align="center">Coming Soon!</p>
-
-<br /><br /><br />
 
 <h4 align="center">Thank you for reading this long long documentation. Maybe you've already got your super powers?</h4>
