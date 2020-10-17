@@ -8,13 +8,27 @@ import { IElementRepresentation, ICtorStyle, ICtorStyleChange } from './../inter
  * @return {ICtorStyle}
  */
 export function ExFStylize(children: IElementRepresentation[]) {
-	const content = createStyleContent(children);
-	const styles = content.map((text: string) => {
-		const style = document.createElement('style');
-		style.textContent = text;
-		return style;
-	});
+	const content = [];
+	const styles = [];
 
+	if (typeof children[0] === 'object' && children[0].tag === 'style') {
+		children.forEach(child => {
+			const styleText = createStyleContent(child.children).join(' ');
+			const styleEl = document.createElement('style');
+			styleEl.textContent = styleText;
+
+			content.push(styleText)
+			styles.push(styleEl)
+		})
+	} else {
+		const styleText = createStyleContent(children).join(' ');
+		const styleEl = document.createElement('style');
+		styleEl.textContent = styleText;
+
+		content.push(styleText)
+		styles.push(styleEl)
+	}
+	
 	return { styles, content };
 }
 
@@ -44,7 +58,7 @@ export function createStyleContent(children: (object | string)[]) {
 				arr = arr.slice(0, arr.length - 1);
 			}
 		} else {
-			let lastEl = arr[arr.length - 1] as string;
+			const lastEl = arr[arr.length - 1] as string;
 
 			const indexOfOpen = lastEl.indexOf('{');
 			const lastSelector = lastEl.slice(0, indexOfOpen).trim();
@@ -84,17 +98,17 @@ export function createStyleContent(children: (object | string)[]) {
  */
 export function extractStyleChanges(style: ICtorStyle, rep: IElementRepresentation[]) {
 	const { styles, content } = style;
-	const newStyles = createStyleContent(rep);
+	const newStyles = ExFStylize(rep);
 	const changes: ICtorStyleChange[] = [];
 
-	newStyles.forEach((text: string, i: number) => {
+	newStyles.content.forEach((text: string, i: number) => {
 		if (text !== content[i]) {
 			changes.push({ element: styles[i], content: text });
 		}
 	});
 
 	return {
-		rep: newStyles,
+		rep: newStyles.content,
 		commit: () => {
 			changes.forEach(({ element, content }) => {
 				element.textContent = content;
