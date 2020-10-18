@@ -10,12 +10,13 @@ import { Ctr } from "../interfaces/interfaces";
  */
 export function CustomElement({ selector }: { selector: string }) {
 	return (target: Ctr<any>) => {
-		Object.defineProperty(target.prototype, 'selector', {
+		const element = bindDependencies(target);
+		Object.defineProperty(element.prototype, 'selector', {
 			value: selector,
 			writable: false,
 		});
 
-		customElements.define(selector, target);
-		return bindDependencies(target);
+		customElements.define(selector, element);
+		return element
 	};
 }

@@ -19,9 +19,10 @@ export function resolveDependecies(target: Ctr<any>) {
     const tokens = Reflect.getMetadata('design:paramtypes', target) || [];
     const params = tokens.map(resolveDependecies);
 
-    container.set(target.name, target);
+    const service = new target(...params);
+    container.set(target.name, service);
 
-    return new target(...params);
+    return service;
 }
 
 /**
@@ -34,8 +35,10 @@ export function resolveDependecies(target: Ctr<any>) {
 export function bindDependencies(target: Ctr<any>) {
     const metadata = Reflect.getMetadata('design:paramtypes', target) || [];
     const params = metadata.map(resolveDependecies);
-    const t = target.bind(target, ...params);
-    t.prototype = Object.create(target.prototype)
 
-    return t;
+    return class extends target {
+        constructor() {
+            super(...params)
+        }
+    } as any
 }
