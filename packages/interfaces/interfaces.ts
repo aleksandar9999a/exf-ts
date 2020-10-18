@@ -9,7 +9,10 @@ export interface IExFModule {
 	modules?: IExFModule[];
 	bootstraps?: any[];
 	root?: string;
+	services?: any[]
 }
+
+export interface Ctr<T> { new(...args: any[]): T; }
 
 export interface Props {
 	[key: string]: any;

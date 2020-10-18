@@ -1,17 +1,26 @@
 import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
 import '@webcomponents/custom-elements';
 import '@webcomponents/shadydom';
+import 'reflect-metadata';
 
 import './polyfills/Node.prototype.remove';
 import './polyfills/Node.prototype.replaceWith';
 import './polyfills/NodeList.prototype.forEach';
 
-import { CustomElement, Prop, State, Ref } from './decorators';
+import { CustomElement, Prop, State, Ref, Injectable } from './decorators';
 import { IElementRepresentation } from './interfaces/interfaces';
 import { ExFModule } from './modules/modules';
 import { Component } from './component/Component';
 
-export { CustomElement, Component, Prop, State, Ref, ExFModule };
+export {
+	ExFModule,
+	CustomElement,
+	Component,
+	Prop,
+	State,
+	Ref,
+	Injectable
+};
 
 /**
  * ExF - Default JSX Engine
