@@ -8,9 +8,12 @@ import { Ctr } from "../interfaces/interfaces";
  * 
  * @return {Ctr<any>}
  */
-export function CustomElement({ selector }: { selector: string }) {
+export function CustomElement({ selector, dependencyInjection }: { selector: string, dependencyInjection?: boolean }) {
 	return (target: Ctr<any>) => {
-		const element = bindDependencies(target);
+		const element = !!dependencyInjection
+			? bindDependencies(target)
+			: target
+
 		Object.defineProperty(element.prototype, 'selector', {
 			value: selector,
 			writable: false,
