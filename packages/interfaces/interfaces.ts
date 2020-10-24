@@ -4,6 +4,12 @@ export interface IElementRepresentation {
 	children: IElementRepresentation[];
 }
 
+export interface ICustomElement {
+	selector: string,
+	dependencyInjection?: boolean,
+	shadowMode?: 'open' | 'closed'
+}
+
 export interface IExFModule {
 	components?: any[];
 	modules?: IExFModule[];

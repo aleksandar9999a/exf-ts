@@ -1,5 +1,6 @@
 import { bindDependencies } from "../dependencyInjection/dependencyInjection";
-import { Ctr } from "../interfaces/interfaces";
+import { Ctr, ICustomElement } from "../interfaces/interfaces";
+
 
 /**
  * Define custom element
@@ -8,7 +9,7 @@ import { Ctr } from "../interfaces/interfaces";
  * 
  * @return {Ctr<any>}
  */
-export function CustomElement({ selector, dependencyInjection }: { selector: string, dependencyInjection?: boolean }) {
+export function CustomElement({ selector, dependencyInjection, shadowMode }: ICustomElement) {
 	return (target: Ctr<any>) => {
 		const element = !!dependencyInjection
 			? bindDependencies(target)
@@ -16,10 +17,14 @@ export function CustomElement({ selector, dependencyInjection }: { selector: str
 
 		Object.defineProperty(element.prototype, 'selector', {
 			value: selector,
-			writable: false,
+			writable: false
 		});
 
+		if (typeof shadowMode === 'string') {
+			element.shadowMode = shadowMode;
+		}
+
 		customElements.define(selector, element);
-		return element
+		return element;
 	};
 }

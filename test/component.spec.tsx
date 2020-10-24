@@ -81,5 +81,32 @@ describe('ExF tests', () => {
 			el.setAttribute('test', 'work');
 			expect(el.getAttribute('test')).toEqual('work');
 		})
+
+		test('Expect element with open shadow dom', () => {
+			@CustomElement({
+				selector: 'exf-test6'
+			})
+			class Test extends Component {
+				render() {
+					return <div>test</div>
+				}
+			}
+
+			expect(Test.shadowMode).toEqual('open');
+		})
+
+		test('Expect element with closed shadow dom', () => {
+			@CustomElement({
+				selector: 'exf-test7',
+				shadowMode: 'closed'
+			})
+			class Test extends Component {
+				render() {
+					return <div>test</div>
+				}
+			}
+
+			expect(Test.shadowMode).toEqual('closed');
+		})
 	})
 })
