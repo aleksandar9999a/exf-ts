@@ -5,7 +5,6 @@ import { pushWork } from '../workLoop/work-loop';
 export class Component extends HTMLElement {
 	private _root!: ShadowRoot;
 	private _representation!: IElementRepresentation;
-	private _html!: HTMLElement;
 	private _ctorStyle: ICtorStyle = {
 		styles: [],
 		content: [],
@@ -13,40 +12,43 @@ export class Component extends HTMLElement {
 	private _props: Props = {};
 	private _state: State = {};
 
+	_html!: HTMLElement;
+	shadowMode: 'closed' | 'open' = 'open'
+
+	onDestroy() {}
+	onCreate() {}
+	stylize() { return { tag: 'style', props: {}, children: [] } }
+	render() { return { tag: 'div', props: {}, children: [] } }
+
 	connectedCallback() {
-		this._root = this.attachShadow({ mode: 'closed' });
-		this._representation = (this as any).render();
+		this._root = this.attachShadow({ mode: this.shadowMode });
+		this._representation = this.render();
 		this._html = representationParser(this._representation);
 
 		this._root.appendChild(this._html);
 
-		if (!!(this as any).stylize) {
-			const styleRep = (this as any).stylize();
-			this._ctorStyle = ExFStylize(styleRep.children);
+		const styleRep = this.stylize();
 
-			this._ctorStyle.styles.forEach((style) => {
-				this._root.appendChild(style);
-			});
-		}
-
-		if (!!(this as any).onCreate) {
-			(this as any).onCreate();
-		}
-	}
-
-	disconnectedCallback() {
-		if (!!(this as any).onDestroy) {
-			(this as any).onDestroy();
-		}
-	}
-
-	private updateStyle() {
-		if (!(this as any).stylize) {
+		if (styleRep.children.length === 0) {
 			return;
 		}
 
+		this._ctorStyle = ExFStylize(styleRep.children);
+
+		this._ctorStyle.styles.forEach(style => {
+			this._root.appendChild(style);
+		});
+
+		this.onCreate();
+	}
+
+	disconnectedCallback() {
+		this.onDestroy();
+	}
+
+	private updateStyle() {
 		pushWork(() => {
-			const newRep = (this as any).stylize();
+			const newRep = this.stylize();
 			const { rep, commit } = extractStyleChanges(this._ctorStyle, newRep.children);
 			this._ctorStyle.content = rep;
 
@@ -55,13 +57,13 @@ export class Component extends HTMLElement {
 	}
 
 	private update() {
-		if (!(this as any).render || !this._root) {
+		if (!this._root) {
 			return;
 		}
 
 		pushWork(() => {
-			const newRep = (this as any).render();
-			const changes = extractChanges((this._root as any) as ChildNode, [this._representation], [newRep]);
+			const newRep = this.render();
+			const changes = extractChanges(this._root as any as ChildNode, [this._representation], [newRep]);
 			this._representation = newRep;
 			return changes;
 		});
@@ -72,13 +74,10 @@ export class Component extends HTMLElement {
 
 		if (type === 'state') {
 			this.update();
-		} else if (type === 'style' && !!(this as any).stylize) {
+		} else if (type === 'style' && !!this.stylize) {
 			this.updateStyle();
 		} else {
-			if (!!(this as any).stylize) {
-				this.updateStyle();
-			}
-
+			this.updateStyle();
 			this.update();
 		}
 	}
