@@ -3,39 +3,65 @@ import { IElementRepresentation, ICtorStyle, ICtorStyleChange } from './../inter
 /**
  * Create Style Elements
  *
- * @param {IElementRepresentation[]}
+ * @param {IElementRepresentation[]} children
+ * @param {Boolean} isCreateStyles
  *
  * @return {ICtorStyle}
  */
-export function ExFStylize(children: IElementRepresentation[]) {
-	const content = [];
-	const styles = [];
+export function ExFStylize(children: IElementRepresentation[], isCreateStyles: boolean = true) {
+	let content: string[] = [];
+	let styles: HTMLStyleElement[] = [];
 
 	if (typeof children[0] === 'object' && children[0].tag === 'style') {
 		children.forEach(child => {
-			const styleText = createStyleContent(child.children).join(' ');
-			const styleEl = document.createElement('style');
-			styleEl.textContent = styleText;
+			content = addStyleContentToContainer(content, child.children);
 
-			content.push(styleText)
-			styles.push(styleEl)
+			if (isCreateStyles) {
+				styles = addStylesToContainer(styles, content[content.length - 1]);
+			}
 		})
 	} else {
-		const styleText = createStyleContent(children).join(' ');
-		const styleEl = document.createElement('style');
-		styleEl.textContent = styleText;
+		content = addStyleContentToContainer(content, children);
 
-		content.push(styleText)
-		styles.push(styleEl)
+		if (isCreateStyles) {
+			styles = addStylesToContainer(styles, content[content.length - 1]);
+		}
 	}
 	
 	return { styles, content };
 }
 
 /**
+ * Add style content to container
+ * 
+ * @param {string[]} container 
+ * @param {IElementRepresentation[]} children 
+ * 
+ * @returns {string[]}
+ */
+function addStyleContentToContainer(container: string[], children: IElementRepresentation[]) {
+	const styleText = createStyleContent(children).join(' ');
+	return [...container, styleText]
+}
+
+/**
+ * Add Styles to container
+ * 
+ * @param {HTMLStyleElement[]} container 
+ * @param {String} text
+ * 
+ * @returns {HTMLStyleElement[]}
+ */
+function addStylesToContainer(container: HTMLStyleElement[], text: string) {
+	const styleEl = document.createElement('style');
+	styleEl.textContent = text;
+	return [...container, styleEl]
+}
+
+/**
  * Create text content for style element
  *
- * @param { (Object | String)[]}
+ * @param { (Object | String)[]} children
  *
  * @return {String[]}
  */
@@ -98,7 +124,7 @@ export function createStyleContent(children: (object | string)[]) {
  */
 export function extractStyleChanges(style: ICtorStyle, rep: IElementRepresentation[]) {
 	const { styles, content } = style;
-	const newStyles = ExFStylize(rep);
+	const newStyles = ExFStylize(rep, false);
 	const changes: ICtorStyleChange[] = [];
 
 	newStyles.content.forEach((text: string, i: number) => {
