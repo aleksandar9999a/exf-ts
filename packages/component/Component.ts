@@ -13,7 +13,6 @@ export class Component extends HTMLElement {
 	private _state: State = {};
 
 	_html!: HTMLElement;
-	static shadowMode: 'closed' | 'open' = 'open'
 
 	onDestroy() {}
 	onCreate() {}
@@ -21,7 +20,10 @@ export class Component extends HTMLElement {
 	render() { return { tag: 'div', props: {}, children: [] } }
 
 	connectedCallback() {
-		this._root = this.attachShadow({ mode: Component.shadowMode });
+		const mode = typeof (this as any).shadowMode === 'string'
+			? (this as any).shadowMode
+			: 'open'
+		this._root = this.attachShadow({ mode });
 		this._representation = this.render();
 		this._html = representationParser(this._representation);
 
@@ -49,8 +51,8 @@ export class Component extends HTMLElement {
 	private updateStyle() {
 		pushWork(() => {
 			const newRep = this.stylize();
-			const { rep, commit } = extractStyleChanges(this._ctorStyle, newRep.children);
-			this._ctorStyle.content = rep;
+			const { rep, commit } = extractStyleChanges(this._root as any as ChildNode, this._ctorStyle, newRep.children);
+			this._ctorStyle = rep;
 
 			return commit;
 		});

@@ -4,30 +4,23 @@ import { IElementRepresentation, ICtorStyle, ICtorStyleChange } from './../inter
  * Create Style Elements
  *
  * @param {IElementRepresentation[]} children
- * @param {Boolean} isCreateStyles
  *
  * @return {ICtorStyle}
  */
-export function ExFStylize(children: IElementRepresentation[], isCreateStyles: boolean = true) {
+export function ExFStylize(children: IElementRepresentation[]) {
 	let content: string[] = [];
 	let styles: HTMLStyleElement[] = [];
 
 	if (typeof children[0] === 'object' && children[0].tag === 'style') {
 		children.forEach(child => {
 			content = addStyleContentToContainer(content, child.children);
-
-			if (isCreateStyles) {
-				styles = addStylesToContainer(styles, content[content.length - 1]);
-			}
+			styles = addStylesToContainer(styles, content[content.length - 1]);
 		})
 	} else {
 		content = addStyleContentToContainer(content, children);
-
-		if (isCreateStyles) {
-			styles = addStylesToContainer(styles, content[content.length - 1]);
-		}
+		styles = addStylesToContainer(styles, content[content.length - 1]);
 	}
-	
+
 	return { styles, content };
 }
 
@@ -117,28 +110,43 @@ export function createStyleContent(children: (object | string)[]) {
 /**
  * Compare old and new style content and return commit function
  *
+ * @param {ChildNode} parent
  * @param {ICtorStyle} style
  * @param {IElementRepresentation[]} rep
  *
  * @return {Function}
  */
-export function extractStyleChanges(style: ICtorStyle, rep: IElementRepresentation[]) {
-	const { styles, content } = style;
-	const newStyles = ExFStylize(rep, false);
-	const changes: ICtorStyleChange[] = [];
+export function extractStyleChanges(parent: ChildNode, style: ICtorStyle, rep: IElementRepresentation[]) {
+	let { styles, content } = style;
+	const newStyles = ExFStylize(rep);
 
-	newStyles.content.forEach((text: string, i: number) => {
-		if (text !== content[i]) {
-			changes.push({ element: styles[i], content: text });
+	let changes: Function[] = [];
+
+	content.forEach((text: string, i: number) => {
+		if (text !== newStyles.content[i]) {
+			changes = [
+				...changes,
+				() => styles[i].textContent = text
+			]
 		}
-	});
+	})
+
+	if (styles.length < newStyles.styles.length) {
+		const index = styles.length;
+		const newItems = newStyles.styles.slice(index);
+		const newContent = newStyles.content.slice(index);
+
+		styles = [...styles, ...newItems];
+		content = [...content, ...newContent];
+
+		changes = [
+			...changes,
+			() => newItems.forEach(item => parent.appendChild(item))
+		]
+	}
 
 	return {
-		rep: newStyles.content,
-		commit: () => {
-			changes.forEach(({ element, content }) => {
-				element.textContent = content;
-			});
-		},
+		rep: { styles, content },
+		commit: changes
 	};
 }

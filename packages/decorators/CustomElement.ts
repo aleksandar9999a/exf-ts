@@ -21,7 +21,10 @@ export function CustomElement({ selector, dependencyInjection, shadowMode }: ICu
 		});
 
 		if (typeof shadowMode === 'string') {
-			element.shadowMode = shadowMode;
+			Object.defineProperty(element.prototype, 'shadowMode', {
+				value: shadowMode,
+				writable: false
+			});
 		}
 
 		customElements.define(selector, element);
