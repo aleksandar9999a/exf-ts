@@ -11,7 +11,7 @@ const container = new Map<string, Ctr<any>>();
  * 
  * @return {Object} 
  */
-export function resolveDependecies(target: Ctr<any>) {
+export function resolveDependecies(target: any) {
     if (container.has(target.name)) {
         return container.get(target.name);
     }
@@ -20,7 +20,7 @@ export function resolveDependecies(target: Ctr<any>) {
     const params = tokens.map(resolveDependecies);
 
     const service = new target(...params);
-    container.set(target.name, service);
+    container.set(target.targetName, service);
 
     return service;
 }
@@ -38,7 +38,9 @@ export function bindDependencies(target: Ctr<any>) {
 
     return class extends target {
         constructor() {
-            super(...params)
+            super(...params);
         }
+
+        static targetName() { return target.name; }
     } as any
 }
