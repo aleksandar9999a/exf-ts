@@ -31,12 +31,24 @@ export {
  *
  * @returns {Object}
  */
-export default function ExF(tag: string, props: any, ...children: (string | IElementRepresentation)[]) {
-	children = (children as any).flat().filter((child: any) => child !== null) as (string | IElementRepresentation)[];
+export default function ExF(tag: string, props: any, ...childs: (string | IElementRepresentation)[]) {
+	const children = childs
+		.reduce((acc: (string | IElementRepresentation)[], x) => {
+			if (x === null) {
+				return acc
+			}
+
+			if (Array.isArray(x)) {
+				return [...acc, ...x]
+			}
+
+			acc.push(x)
+			return acc
+		}, [])
 
 	return {
 		tag,
 		props: props || {},
-		children,
+		children
 	};
 }

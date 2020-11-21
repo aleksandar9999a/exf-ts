@@ -12,12 +12,13 @@ export class Component extends HTMLElement {
 	private _props: Props = {};
 	private _state: State = {};
 
-	_html!: HTMLElement;
+	private _html!: HTMLElement;
 
 	onDestroy() {}
 	onCreate() {}
 	stylize() { return { tag: 'style', props: {}, children: [] } }
 	render() { return { tag: 'div', props: {}, children: [] } }
+	getHTML () { return this._html; }
 
 	connectedCallback() {
 		const mode = typeof (this as any).shadowMode === 'string'

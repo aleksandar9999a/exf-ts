@@ -1,6 +1,7 @@
 import { IElementRepresentation } from './../interfaces/interfaces';
 import { events } from './events-register';
 import { isExistElement } from './../modules/modules';
+import { diff } from './differences'
 
 /**
  * Parse IElementRepresentation | string to HTML Element
@@ -119,30 +120,41 @@ function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElem
 		];
 	}
 
-	return Object.keys(oldEl.props || {}).reduce((arr: any[], key: string) => {
-		const oldProp = (oldEl.props as any)[key];
-		const newProp = (newEl.props as any)[key];
+	const differences = diff(oldEl.props || {}, newEl.props || {})
+	const diffKeys = Object.keys(differences)
+	const isRegisteredComponent = isExistElement(oldEl.tag);
 
-		if (key === 'style') {
-			const styleProps = Object.keys(newProp);
-
-			const changes = styleProps.reduce((props: any[], key: string) => {
-				if ((oldProp as any)[key] !== (newProp as any)[key]) {
-					return [...props, () => ((child as any).style[key] = (newProp as any)[key])];
+	return diffKeys.reduce((acc: (() => void)[], key) => {
+		if (!isRegisteredComponent && typeof differences[key] === 'function' && !!events[key]) {
+			acc.push(
+				() => {
+					child.addEventListener(events[key], differences[key]);
 				}
-
-				return props;
-			}, []);
-
-			return [...arr, ...changes];
+			)
+		} else if (key === 'style') {
+			acc.push(
+				() => {
+					Object.keys(differences[key]).forEach(style => {
+						(child as any).style[style] = differences[key][style];
+					});
+				}
+			)
+		} else if (key === 'className') {
+			acc.push(
+				() => {
+					(child as any)[key] = differences[key];
+				}
+			)
+		} else {
+			acc.push(
+				() => {
+					(child as any).setAttribute(key, differences[key]);
+				}
+			)
 		}
 
-		if (oldProp !== newProp) {
-			return [...arr, () => ((child as any)[key] = newProp)];
-		}
-
-		return arr;
-	}, []);
+		return acc
+	}, [])
 }
 
 /**

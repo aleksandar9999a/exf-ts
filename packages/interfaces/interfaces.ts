@@ -2,6 +2,7 @@ export interface IElementRepresentation {
 	tag: string;
 	props: object;
 	children: IElementRepresentation[];
+	element?: HTMLElement | null
 }
 
 export interface ICustomElement {
