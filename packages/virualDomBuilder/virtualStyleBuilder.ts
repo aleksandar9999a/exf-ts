@@ -126,7 +126,7 @@ export function extractStyleChanges(parent: ChildNode, style: ICtorStyle, rep: I
 		if (text !== newStyles.content[i]) {
 			changes = [
 				...changes,
-				() => styles[i].textContent = text
+				() => styles[i].textContent = newStyles.content[i]
 			]
 		}
 	})
@@ -146,7 +146,7 @@ export function extractStyleChanges(parent: ChildNode, style: ICtorStyle, rep: I
 	}
 
 	return {
-		rep: { styles, content },
+		rep: { styles, content: newStyles.content },
 		commit: changes
 	};
 }
