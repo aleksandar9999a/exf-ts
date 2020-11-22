@@ -122,16 +122,9 @@ function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElem
 
 	const differences = diff(oldEl.props || {}, newEl.props || {})
 	const diffKeys = Object.keys(differences)
-	const isRegisteredComponent = isExistElement(oldEl.tag);
 
 	return diffKeys.reduce((acc: (() => void)[], key) => {
-		if (!isRegisteredComponent && typeof differences[key] === 'function' && !!events[key]) {
-			acc.push(
-				() => {
-					child.addEventListener(events[key], differences[key]);
-				}
-			)
-		} else if (key === 'style') {
+		if (key === 'style') {
 			acc.push(
 				() => {
 					Object.keys(differences[key]).forEach(style => {
@@ -139,16 +132,10 @@ function basicDiff(child: ChildNode, oldEl: IElementRepresentation, newEl: IElem
 					});
 				}
 			)
-		} else if (key === 'className') {
-			acc.push(
-				() => {
-					(child as any)[key] = differences[key];
-				}
-			)
 		} else {
 			acc.push(
 				() => {
-					(child as any).setAttribute(key, differences[key]);
+					(child as any)[key] = differences[key];
 				}
 			)
 		}
