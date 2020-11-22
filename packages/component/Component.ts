@@ -23,7 +23,7 @@ export class Component extends HTMLElement {
 	connectedCallback() {
 		const mode = typeof (this as any).shadowMode === 'string'
 			? (this as any).shadowMode
-			: 'open'
+			: 'closed'
 		this._root = this.attachShadow({ mode });
 		this._representation = this.render();
 		this._html = representationParser(this._representation);
