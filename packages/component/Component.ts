@@ -21,9 +21,19 @@ export class Component extends HTMLElement {
 	getHTML () { return this._html; }
 
 	connectedCallback() {
+		this.initComponent()
+		this.onCreate();
+	}
+
+	disconnectedCallback() {
+		this.onDestroy();
+	}
+
+	private initComponent () {
 		const mode = typeof (this as any).shadowMode === 'string'
-			? (this as any).shadowMode
-			: 'closed'
+		? (this as any).shadowMode
+		: 'closed'
+
 		this._root = this.attachShadow({ mode });
 		this._representation = this.render();
 		this._html = representationParser(this._representation);
@@ -41,12 +51,6 @@ export class Component extends HTMLElement {
 		this._ctorStyle.styles.forEach(style => {
 			this._root.appendChild(style);
 		});
-
-		this.onCreate();
-	}
-
-	disconnectedCallback() {
-		this.onDestroy();
 	}
 
 	private updateStyle() {
@@ -77,7 +81,7 @@ export class Component extends HTMLElement {
 
 		if (type === 'state') {
 			this.update();
-		} else if (type === 'style' && !!this.stylize) {
+		} else if (type === 'style') {
 			this.updateStyle();
 		} else {
 			this.updateStyle();
