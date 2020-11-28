@@ -14,6 +14,9 @@ export class Component extends HTMLElement {
 
 	private _html!: HTMLElement;
 
+	private repTimeout: any = null;
+	private styleTimeout: any = null;
+
 	onDestroy() {}
 	onCreate() {}
 	stylize() { return { tag: 'style', props: {}, children: [] } }
@@ -27,6 +30,22 @@ export class Component extends HTMLElement {
 
 	disconnectedCallback() {
 		this.onDestroy();
+		this.cleanDOMEffect()
+		this.cleanStyleEffect()
+	}
+	
+	private cleanDOMEffect () {
+		if (this.repTimeout) {
+			clearTimeout(this.repTimeout)
+			this.repTimeout = null
+		}
+	}
+
+	private cleanStyleEffect () {
+		if (this.styleTimeout) {
+			clearTimeout(this.styleTimeout)
+			this.styleTimeout = null
+		}
 	}
 
 	private initComponent () {
@@ -54,13 +73,19 @@ export class Component extends HTMLElement {
 	}
 
 	private updateStyle() {
-		pushWork(() => {
-			const newRep = this.stylize();
-			const { rep, commit } = extractStyleChanges(this._root as any as ChildNode, this._ctorStyle, newRep.children);
-			this._ctorStyle = rep;
+		if (!this.styleTimeout) {
+			this.styleTimeout = setTimeout(() => {
+				pushWork(() => {
+					const newRep = this.stylize()
+					const { rep, commit } = extractStyleChanges(this._root as any as ChildNode, this._ctorStyle, newRep.children);
+					this._ctorStyle = rep;
+		
+					return commit;
+				})
 
-			return commit;
-		});
+				this.cleanStyleEffect()
+			}, 0)
+		}
 	}
 
 	private update() {
@@ -68,12 +93,19 @@ export class Component extends HTMLElement {
 			return;
 		}
 
-		pushWork(() => {
-			const newRep = this.render();
-			const changes = extractChanges(this._root as any as ChildNode, [this._representation], [newRep]);
-			this._representation = newRep;
-			return changes;
-		});
+		if (!this.repTimeout) {
+			this.repTimeout = setTimeout(() => {
+				pushWork(() => {
+					const newRep = this.render();
+					const changes = extractChanges(this._root as any as ChildNode, [this._representation], [newRep]);
+					this._representation = newRep;
+					return changes;
+				});
+
+				this.cleanDOMEffect()
+			})
+		}
+
 	}
 
 	setAttribute(key: string, value: any, type?: string) {
