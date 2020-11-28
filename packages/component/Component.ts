@@ -19,6 +19,8 @@ export class Component extends HTMLElement {
 
 	onDestroy() {}
 	onCreate() {}
+	onDOMUpdate() {}
+	onStyleUpdate() {}
 	stylize() { return { tag: 'style', props: {}, children: [] } }
 	render() { return { tag: 'div', props: {}, children: [] } }
 	getHTML () { return this._html; }
@@ -80,6 +82,7 @@ export class Component extends HTMLElement {
 					const { rep, commit } = extractStyleChanges(this._root as any as ChildNode, this._ctorStyle, newRep.children);
 					this._ctorStyle = rep;
 		
+					commit.push(this.onStyleUpdate.bind(this));
 					return commit;
 				})
 
@@ -99,6 +102,7 @@ export class Component extends HTMLElement {
 					const newRep = this.render();
 					const changes = extractChanges(this._root as any as ChildNode, [this._representation], [newRep]);
 					this._representation = newRep;
+					changes.push(this.onDOMUpdate.bind(this));
 					return changes;
 				});
 
