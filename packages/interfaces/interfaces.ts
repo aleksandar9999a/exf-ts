@@ -16,7 +16,8 @@ export interface IExFModule {
 	modules?: IExFModule[];
 	bootstraps?: any[];
 	root?: string;
-	services?: any[]
+	services?: any[],
+	inject?: { [key: string]: any }
 }
 
 export interface Ctr<T> { new(...args: any[]): T; }
@@ -66,4 +67,8 @@ declare global {
 			[elemName: string]: any;
 		}
 	}
+}
+
+export interface IInject {
+  key?: string
 }

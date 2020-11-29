@@ -1,4 +1,5 @@
 import { IExFModule } from './../interfaces/interfaces';
+import { Component } from './../';
 
 const container = {	
 	components: {},	
@@ -40,11 +41,11 @@ function bootstrap(id: string, Ctor: any) {
  * @return {Void}
  */
 function register(target: any, cmp: any) {
-	const selector = cmp.prototype.selector;	
+	const selector = cmp.prototype.selector;
 	
 	if (target[selector]) {	
 		throw new Error(`Component ${selector} is already registered!`);	
-	}	
+	}
 	
 	target[selector] = cmp;	
 }
@@ -56,7 +57,14 @@ function register(target: any, cmp: any) {
  *
  * @returns {Void}
  */
-export function ExFModule({ components, modules, bootstraps, root }: IExFModule) {	
+export function ExFModule({ components, modules, bootstraps, root, inject }: IExFModule) {	
+	if (inject) {
+		Component._injected = {
+			...Component._injected,
+			...inject
+		}
+	}
+
 	(components || []).forEach(cmp => {
 		register(container.components, cmp);
 	});

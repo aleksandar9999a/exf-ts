@@ -9,8 +9,11 @@ export class Component extends HTMLElement {
 		styles: [],
 		content: [],
 	};
+
 	private _props: Props = {};
 	private _state: State = {};
+
+	static _injected: { [key: string]: any } = {}
 
 	private _html!: HTMLElement;
 
@@ -127,5 +130,9 @@ export class Component extends HTMLElement {
 
 	getAttribute(key: string) {
 		return this._props[key];
+	}
+
+	getInjected(key: string) {
+		return Component._injected[key];
 	}
 }
