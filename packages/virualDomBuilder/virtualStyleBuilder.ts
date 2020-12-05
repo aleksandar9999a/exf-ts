@@ -1,4 +1,4 @@
-import { IElementRepresentation, ICtorStyle, ICtorStyleChange } from './../interfaces/interfaces';
+import { IElementRepresentation, ICtorStyle } from './../interfaces/interfaces';
 
 /**
  * Create Style Elements
@@ -13,12 +13,12 @@ export function ExFStylize(children: IElementRepresentation[]) {
 
 	if (typeof children[0] === 'object' && children[0].tag === 'style') {
 		children.forEach(child => {
-			content = addStyleContentToContainer(content, child.children);
-			styles = addStylesToContainer(styles, content[content.length - 1]);
+			addStyleContentToContainer(content, child.children);
+			addStylesToContainer(styles, content[content.length - 1]);
 		})
 	} else {
-		content = addStyleContentToContainer(content, children);
-		styles = addStylesToContainer(styles, content[content.length - 1]);
+		addStyleContentToContainer(content, children);
+		addStylesToContainer(styles, content[content.length - 1]);
 	}
 
 	return { styles, content };
@@ -34,7 +34,8 @@ export function ExFStylize(children: IElementRepresentation[]) {
  */
 function addStyleContentToContainer(container: string[], children: IElementRepresentation[]) {
 	const styleText = createStyleContent(children).join(' ');
-	return [...container, styleText]
+	container.push(styleText)
+	return container
 }
 
 /**
@@ -48,7 +49,8 @@ function addStyleContentToContainer(container: string[], children: IElementRepre
 function addStylesToContainer(container: HTMLStyleElement[], text: string) {
 	const styleEl = document.createElement('style');
 	styleEl.textContent = text;
-	return [...container, styleEl]
+	container.push(styleEl)
+	return container
 }
 
 /**

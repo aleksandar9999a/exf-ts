@@ -13,15 +13,15 @@ export function ExF(tag: string, props: any, ...childs: (string | IElementRepres
 	const children = childs
 		.reduce((acc: (string | IElementRepresentation)[], x) => {
 			if (x === null) {
-				return acc
+				return acc;
 			}
 
 			if (Array.isArray(x)) {
-				return [...acc, ...x]
+				return [...acc, ...x];
 			}
 
-			acc.push(x)
-			return acc
+			acc.push(x);
+			return acc;
 		}, [])
 
 	return {

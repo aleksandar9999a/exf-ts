@@ -22,6 +22,7 @@ function customRequestIdleCallback(handler: (obj: object) => void) {
 
 let queue: (() => () => void)[] = [];
 let result: any[] = [];
+let isProcessWork = false;
 
 /**
  * Push work in queue
@@ -32,6 +33,11 @@ let result: any[] = [];
  */
 export function pushWork(work: any) {
 	queue = queue.concat(work);
+
+	if (isProcessWork) {
+		return;
+	}
+
 	processWork();
 }
 
@@ -50,11 +56,11 @@ function processWork() {
 		}
 
 		if (queue.length > 0) {
-			processWork();
+			return processWork();
 		}
 
 		if (result.length > 0) {
-			commitWork();
+			return commitWork();
 		}
 	});
 }
@@ -65,6 +71,7 @@ function processWork() {
  * @return {Void}
  */
 function commitWork() {
+	isProcessWork = false;
 	requestAnimationFrame(() => {
 		result.forEach((part) => part());
 		result = [];
