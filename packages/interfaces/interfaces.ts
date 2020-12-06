@@ -17,7 +17,8 @@ export interface IExFModule {
 	bootstraps?: any[];
 	root?: string;
 	services?: any[],
-	inject?: { [key: string]: any }
+	inject?: { [key: string]: any },
+	styles?: string[] | { [key: string]: any }[]
 }
 
 export interface Ctr<T> { new(...args: any[]): T; }

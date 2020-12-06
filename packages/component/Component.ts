@@ -1,4 +1,5 @@
 import { IElementRepresentation, ICtorStyle, Props, State } from '../interfaces/interfaces';
+import { getGlobalStyles } from '../modules/modules';
 import { representationParser, ExFStylize, extractStyleChanges, extractChanges } from '../virualDomBuilder';
 import { pushWork } from '../workLoop/work-loop';
 
@@ -7,13 +8,15 @@ export class Component extends HTMLElement {
 	private _representation!: IElementRepresentation;
 	private _ctorStyle: ICtorStyle = {
 		styles: [],
-		content: [],
+		content: []
 	};
 
 	private _props: Props = {};
 	private _state: State = {};
-
-	static _injected: { [key: string]: any } = {}
+	private _globalStyles: ICtorStyle = {
+		styles: [],
+		content: []
+	}
 
 	private _html!: HTMLElement;
 
@@ -64,6 +67,11 @@ export class Component extends HTMLElement {
 
 		this._root.appendChild(this._html);
 
+		this.initGlobalStyles();
+		this.initStyles();
+	}
+
+	private initStyles() {
 		const styleRep = this.stylize();
 
 		if (styleRep.children.length === 0) {
@@ -73,6 +81,20 @@ export class Component extends HTMLElement {
 		this._ctorStyle = ExFStylize(styleRep.children);
 
 		this._ctorStyle.styles.forEach(style => {
+			this._root.appendChild(style);
+		});
+	}
+
+	private initGlobalStyles () {
+		const globalStyles = getGlobalStyles();
+
+		if (globalStyles.length === 0) {
+			return;
+		}
+
+		this._globalStyles = ExFStylize(globalStyles);
+
+		this._globalStyles.styles.forEach(style => {
 			this._root.appendChild(style);
 		});
 	}
@@ -130,9 +152,5 @@ export class Component extends HTMLElement {
 
 	getAttribute(key: string) {
 		return this._props[key];
-	}
-
-	getInjected(key: string) {
-		return Component._injected[key];
 	}
 }

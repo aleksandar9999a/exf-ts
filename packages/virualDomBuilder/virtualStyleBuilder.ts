@@ -61,9 +61,13 @@ function addStylesToContainer(container: HTMLStyleElement[], text: string) {
  * @return {String[]}
  */
 export function createStyleContent(children: (object | string)[]) {
-	const allStyles = children.reduce((arr: any, child) => {
+	const allStyles = children.reduce((arr: any, child, i) => {
 		if (typeof child === 'string') {
-			arr.push(`${(child as string).trim()} {`);
+			const str = typeof children[i + 1] === 'object'
+				? `${(child as string).trim()} {`
+				: `${(child as string).trim()}`
+
+			arr.push(str);
 		} else if (arr[arr.length - 1].includes('@media') || arr[arr.length - 1].includes('@keyframes')) {
 			Object.keys(child).forEach((key) => {
 				createStyleContent([key, (child as any)[key]]).forEach((s: string) => {

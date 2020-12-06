@@ -1,4 +1,5 @@
 import { IInject } from '../interfaces/interfaces';
+import { getGlobalInjected } from '../modules/modules';
 
 /**
  * Inject Decorator
@@ -7,7 +8,7 @@ import { IInject } from '../interfaces/interfaces';
  * 
  * @return {() => Void}
  */
-export function Inject(params?: IInject) {
+export function ModuleInjected(params?: IInject) {
 	/**
 	 * @param {Any} target
 	 * @param {String} key
@@ -18,10 +19,10 @@ export function Inject(params?: IInject) {
 		Object.defineProperty(target, key, {
 			get() {
         if (params && params.key) {
-					return this.getInjected(params.key);
+					return getGlobalInjected(params.key);
         }
 
-				return this.getInjected(key);
+				return getGlobalInjected(key);
 			},
 		});
 	};

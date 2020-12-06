@@ -13,7 +13,7 @@ import {
 	State,
 	Ref,
 	Injectable,
-	Inject
+	ModuleInjected
 } from './decorators';
 
 import { ExFModule } from './modules/modules';
@@ -29,7 +29,7 @@ export {
 	State,
 	Ref,
 	Injectable,
-	Inject
+	ModuleInjected
 };
 
 export default ExF;
