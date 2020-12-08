@@ -57,18 +57,24 @@ export class Component extends HTMLElement {
 	}
 
 	private initComponent () {
+		this.initRoot();
+		this.initGlobalStyles();
+		this.initStyles();
+		this.initDOM();
+	}
+
+	private initRoot() {
 		const mode = typeof (this as any).shadowMode === 'string'
 		? (this as any).shadowMode
 		: 'closed'
 
 		this._root = this.attachShadow({ mode });
+	}
+
+	private initDOM() {
 		this._representation = this.render();
 		this._html = representationParser(this._representation);
-
 		this._root.appendChild(this._html);
-
-		this.initGlobalStyles();
-		this.initStyles();
 	}
 
 	private initStyles() {
@@ -125,7 +131,11 @@ export class Component extends HTMLElement {
 			this.repTimeout = setTimeout(() => {
 				pushWork(() => {
 					const newRep = this.render();
-					const changes = extractChanges(this._root as any as ChildNode, [this._representation], [newRep]);
+					const root = {
+						childNodes: [this._html]
+					}
+
+					const changes = extractChanges(root as any as ChildNode, [this._representation], [newRep]);
 					this._representation = newRep;
 					changes.push(this.onDOMUpdate.bind(this));
 					return changes;
