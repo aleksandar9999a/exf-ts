@@ -106,6 +106,10 @@ export class Component extends HTMLElement {
 	}
 
 	private updateStyle() {
+		if (!this._root) {
+			return;
+		}
+
 		if (!this.styleTimeout) {
 			this.styleTimeout = setTimeout(() => {
 				pushWork(() => {
