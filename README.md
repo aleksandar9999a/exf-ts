@@ -22,14 +22,10 @@ In the next few lines I will list some of the features that ExF combines to gain
 
 - [Virtual DOM](https://bitsofco.de/understanding-the-virtual-dom/) - To make things easier, more sustainable and more dynamic, ExF uses Virtual Dom and updates only what is necessary.
 
-- Virtual Styles - This is not something you could find on Google. Since it turned out to be great to be able to generate a Elements and then update them dynamically, so why not do the same with Styles?
-
 - [TSX](https://www.typescriptlang.org/docs/handbook/jsx.html) - It's actually JSX.
 
-- [Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html) - When I saw decorators for first time they seemed rather strange to me. But this doesn't make them bad.
-
 - etc...
-=
+
 
 <br /><br />
 
@@ -52,348 +48,190 @@ https://github.com/aleksandar9999a/exf-template
 
 <br/><br/>
 
-<h2 align="center">API</h2>
-
-<br />
-
-<div align="center">
-
-| Name | Type | Description |
-| --- | --- | --- |
-| Custom Element | Decorator | Indicate class as ExF Component |
-| Prop | Decorator | Creates a property that serves as input for data |
-| State | Decorator | Create state property - change => update DOM |
-| Ref | Decorator | Get reference to HTML Element in current component |
-| onCreate | Method | This method is invoked each time the custom element is appended into a document-connected element |
-| onDestroy | Method | Invoked each time the custom element is disconnected from the document's DOM |
-| adoptedCallback | Method | Invoked each time the custom element is moved to a new document |
-
-</div>
-
-<br /><br />
-
 <h2 align="center">Documentation</h2>
 
 <br/>
 
-<h3>Basic Component</h3>
+<h3>API</h3>
 
-<p>
-	Let's look at the following code:
-</p>
+<br/><br/>
 
-```javascript
-	import ExF, { CustomElement, Component } from 'exf-ts';
-
-	@CustomElement({
-		selector: 'exf-app'
-	})
-	class App extends Component {
-		stylize() {
-			return (
-				<style>
-					app {
-						{
-							'background': '#000'
-						}
-					}
-				</style>
-			)
-		}
-
-		render() {
-			return (
-				<div className="app">
-					App
-				</div>
-			)
-		}
-	}
-```
-<p>
-Yes, that's enough to create a custom element.
-
-For now, our component consists of a few very simple ingredients:
-
-- @CustomElement - That is the decorator who tells on our app that this is actually a custom element and his tag name is the selector. The selector must include "-", it must also be unique.
-
-- Component - The basic class that defines most of the super powers of ExF.
-
-- stylize - The method who gives us the ability to make our styles dynamic.
-
-- render - The method who gives us the ability to make html dynamic. We must always have this method in our component.
-</p>
-
-<br />
-
-<h3>Prop</h3>
+<h4>Runtime</h4>
 
 ```javascript
-	import ExF, { CustomElement, Component, Prop } from 'exf-ts';
+const runtime = createRuntime()
 
-	@CustomElement({
-		selector: 'exf-app'
-	})
-	class App extends Component {
-		@Prop() top: number = 0;
-		@Prop('style') bg: string = '#fff';
-		@Prop('state') name: string = 'ExF';
+/* We pass rules to runtime so platforms which pass that rules will be mounted */ 
+const rules = {}
 
-		stylize() {
-			return (
-				<style>
-					app {
-						{
-							top: `${this.top}px`
-						}
-					}
-					
-					app {
-						{
-							'background': this.bg
-						}
-					}
-				</style>
-			)
-		}
+runtime.createPlatform({
+  name: 'ex',
+  providers: {
+    service: {
+      type: 'singleton',
+      value: () => import('./Service)
+    }
+  },
+  components: [
+    { tag: 'app', element: () => import('./Component') }
+  ],
+  bootstrap: {
+    element: 'app',
+    container: 'body'
+  },
+  global: {
+    style: `
+      .bg-red {
+        background: red;
+      }
+    `
+  },
+  conditions (rules) {
+    return true
+  }
+})
 
-		render() {
-			return (
-				<div className="app">
-					<h1>{this.name}</h1>
-
-					<p>Current position is: {this.top}px</p>
-				</div>
-			)
-		}
-	}
+runtime.run(rules)
 ```
+
+Runtime looks a little bit as micro front-ends. You can image that platforms are as different apps which can be lazy loaded depending on certain conditions.
+
+<br/><br/>
+
+<h4>Platform</h4>
 
 ```javascript
-	<exf-app name={'ExF'} top={20} bg={'#fff'} />
+const platform = createPlatform({
+  name: 'ex',
+  providers: {
+    service: {
+      type: 'singleton',
+      value: () => import('./Service)
+    }
+  },
+  components: [
+    { tag: 'app', element: () => import('./Component') }
+  ],
+  bootstrap: {
+    element: 'app',
+    container: 'body'
+  },
+  global: {
+    style: `
+      .bg-red {
+        background: red;
+      }
+    `
+  }
+})
+
+platform.mount()
 ```
+Platform is actually app configuration. It registered services, components, global properties and etc.
+Platform provides 5 basic options:
 
-<p>
-Тhe example shows us what is Prop and how we can use it. In short - these are attributes through which we can import data into our components. They also trigger DOM and Style updates.
+- Name -> This is the name of platform and also prefix for components, registered to that platform
+- Providers -> The purpose of providers is to provide component access to services as services can be lazy loaded, singletons or multitons
+- Components -> It provide easy way to register your components. As you see component can be lazy loaded or not. Platform name is 'ex' so name of component will be 'ex-app'
+- Bootstrap -> Provides easy way to say which component to where should be mounted
+- Global -> Properties thats are available in every component. You can also provide styles in it, so this styles will be attached to header. If you decide to use shadow-dow, it will be required manually to add them into component
 
-If you've noticed we have three different Props. The difference between them is in the option they have accepted. 
+<br/><br/>
 
-- @Prop() - Trigger Style and DOM update
-- @Prop('style') - Trigger only Style update
-- @Prop('state') - Trigger only DOM update
-</p>
-
-<br />
-
-<h3>State</h3>
+<h4>Component</h4>
 
 ```javascript
-	import ExF, { CustomElement, Component, State } from 'exf-ts';
+export default (element: Element, dep: { service: () => Promise<{}>}) => {
+  const counter = element.observe(0)
 
-	@CustomElement({
-		selector: 'exf-app'
-	})
-	class App extends Component {
-		@State() top: number = 0;
-		@State('style') bg: string = '#fff';
-		@State('state') name: string = 'ExF';
+  const interval = setInterval(() => {
+    counter.value++
+  }, 1000)
 
-		stylize() {
-			return (
-				<style>
-					app {
-						{
-							top: `${this.top}px`
-						}
-					}
-					
-					app {
-						{
-							'background': this.bg
-						}
-					}
-				</style>
-			)
-		}
+  element.onUnmount(() => {
+    clearInterval(interval)
+  })
 
-		render() {
-			return (
-				<div className="app">
-					<h1>{this.name}</h1>
+  return () => {
+    return (
+      <div className="bg-red">
+        <slot><div>{counter}</div></slot>
+      </div>
+    )
+  }
+}
 
-					<p>Current position is: {this.top}px</p>
-				</div>
-			)
-		}
-	}
+/* or */
+
+export default createElement('ex-app', (element: Element, dep: { service: () => Promise<{}>}) => {
+  const counter = element.observe(0)
+
+  const interval = setInterval(() => {
+    counter.value++
+  }, 1000)
+
+  element.onUnmount(() => {
+    clearInterval(interval)
+  })
+
+  return () => {
+    return (
+      <div className="bg-red">
+        <slot><div>{counter}</div></slot>
+      </div>
+    )
+  }
+})
+
+/* or */
+
+class Service {
+  get (id: string) {
+    return Promise.resolve({ id })
+  }
+}
+
+export default async (element: Element, dep: { service: () => Promise<Service>}) => {
+  const counter = element.observe(0)
+  const service = await dep.service()
+
+  service.get(5)
+    .then(console.debug)
+    .catch(console.debug)
+
+  const interval = setInterval(() => {
+    counter.value++
+  }, 1000)
+
+  element.onUnmount(() => {
+    clearInterval(interval)
+  })
+
+  return () => {
+    return (
+      <div className="bg-red">
+        <slot><div>{counter.value}</div></slot>
+      </div>
+    )
+  }
+}
+
 ```
 
-<p>
-Тhe example shows us what State is and how we can use it. It is like Prop, just they are external state.
+Actually component is very simple. It is a function which receive element and providers, it can be async and return function which return jsx.
 
-- @State() - Trigger Style and DOM update
-- @State('style') - Trigger only Style update
-- @State('state') - Trigger only DOM update
-</p>
-
-<br />
-
-<h3>Ref</h3>
-
-
+- Element.observe -> Make value reactive. It create proxy with format
 ```javascript
-	import ExF, { CustomElement, Component, Ref } from 'exf-ts';
-
-	@CustomElement({
-		selector: 'exf-app'
-	})
-	class App extends Component {
-		@Ref({ id: 'app' }) app!: HTMLElement;
-
-		stylize() {
-			return (
-				<style>
-					app {
-						{
-							'background': '#fff'
-						}
-					}
-				</style>
-			)
-		}
-
-		render() {
-			return (
-				<div id="app" className="app">
-					App
-				</div>
-			)
-		}
-	}
+{
+  value: T,
+  pipe (fn: (value: T, oldValue: T) => any) => any,
+  watch (fn: (value: T, oldValue: T) => any) => any,
+}
 ```
 
-<p>
-	@Ref({ id: 'app' }) works like document.getElementById('app'). It just get reference to element. The components are encapsulated, which means that @Ref only works within the component.
-</p>
+You can make different magic with it. For example you can watch changes on that value as you pass function to watch or you can transform value via pipe, so when you set value, pipes are executed and result at the end will be set as value
 
-<br />
-
-<h3>@Media and @Keyframes</h3>
-
-<br />
-
-<p>Now we can use similar syntax for @media and @keyframes</p>
-
-```javascript
-	import ExF, { CustomElement, Component } from 'exf-ts';
-
-	@CustomElement({
-		selector: 'exf-app'
-	})
-	class App extends Component {
-		stylize() {
-			return (
-				<style>
-					@media screen and (max-width: 1300px) {
-						{
-							'.app': {
-								'height': '300px',
-								'width': '380px',
-							}
-						}
-					}
-
-					@keyframes ring {
-						{
-							'0%': { 
-								'transform': 'rotate(0deg)'
-							},
-
-							'100%': { 
-								'transform': 'rotate(360deg)'
-							}
-						}
-					}
-				</style>
-			)
-		}
-
-		render() {
-			return (
-				<div id="app" className="app">
-					App
-				</div>
-			)
-		}
-	}
-```
-
-<br /><br />
-
-<h2 align="center">Lifecycle Callbacks</h2>
-
-<br />
-
-```javascript
-	import ExF, { CustomElement, Component } from 'exf-ts';
-	import store from 'somewhere';
-
-	@CustomElement({
-		selector: 'exf-app'
-	})
-	class App extends Component {
-		@State('state') isAuth: boolean = false;
-
-		onCreate() {
-			store.subscribe(isAuth => {
-				this.isAuth = isAuth;
-			})
-		}
-
-		onDestroy() {
-			store.unsubscribe();
-		}
-
-		render() {
-			return (
-				<div id="app" className="app">
-					App
-				</div>
-			)
-		}
-	}
-```
-
-<br /><br />
-
-<h2 align="center">The End</h2>
-
-<p align="center">Everything is ok so far, but you may still be wondering how the hell I can run this component without our workflow.</p>
-
-<br />
-
-<p>It is simple: </p>
-
-```javascript
-	const app = new App();
-
-	document.body.appendChild(app);
-```
-
-Or:
-
-```javascript
-	const app = document.createElement('exf-app');
-
-	document.body.appendChild(app);
-```
-
-Or: 
-
-```javascript
-	<exf-app />
-```
-
-<br /><br />
-
-<h4 align="center">Thank you for reading this long long documentation. Maybe you've already got your super powers?</h4>
+- Element.props -> Props that you pass to component, they have the some format as above.
+- Element.onMount, Element.onUnmount -> Function which are executed when component is mounted/unmounted
+- Element.onError -> Handle errors on component
+- dep -> Second argument to function are providers. They are async so they can we lazy loaded or whatever, element is async at all so you can make anything
