@@ -104,7 +104,7 @@ export class Platform {
 
 export function createPlatform (options: PlatformParams) {
   Platform.factory = (tag: string, fn: ComponentFunction) => {
-    return createComponent(tag, fn, depFactory(options.providers))
+    return createComponent(tag, fn, depFactory(options.providers)) as any as typeof Element
   }
 
   if (options.global) {

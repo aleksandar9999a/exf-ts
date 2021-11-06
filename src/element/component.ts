@@ -1,7 +1,7 @@
 import { DOM, Element, ComponentFunction } from './'
 import { ObjectAny } from './interfaces'
 
-export function createComponent (tag: string, fn: ComponentFunction, deps?: ObjectAny) {
+export function createComponent<T extends Element> (tag: string, fn: ComponentFunction, deps?: ObjectAny) {
   class BindedElement extends Element {
     static elementName = tag
 
@@ -11,6 +11,6 @@ export function createComponent (tag: string, fn: ComponentFunction, deps?: Obje
   }
 
   customElements.define(tag, BindedElement)
-  return BindedElement
+  return BindedElement as any as T
 }
 

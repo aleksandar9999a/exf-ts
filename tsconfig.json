@@ -9,6 +9,7 @@
     "downlevelIteration": true,
     "strict": true,
     "moduleResolution": "node",
+    "declaration": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
