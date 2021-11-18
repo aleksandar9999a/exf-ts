@@ -69,7 +69,7 @@ runtime.createPlatform({
   providers: {
     service: {
       type: 'singleton',
-      value: () => import('./Service)
+      value: () => import('./Service')
     }
   },
   components: [
@@ -106,7 +106,7 @@ const platform = createPlatform({
   providers: {
     service: {
       type: 'singleton',
-      value: () => import('./Service)
+      value: () => import('./Service')
     }
   },
   components: [
